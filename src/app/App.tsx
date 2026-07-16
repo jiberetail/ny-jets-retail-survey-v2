@@ -128,7 +128,7 @@ const flowCards: FlowCard[] = [
   {
     flow: "concierge",
     eyebrow: "Merchandise pickup",
-    title: "Concierge Merchandise Pickup",
+    title: "Concierge Pickup",
     description: "Shop Jets gear now and pick it up at a nearby merchandise desk.",
     action: "Start Pickup Order",
     Icon: PackageCheck,
