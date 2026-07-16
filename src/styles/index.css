@@ -1219,6 +1219,21 @@ button {
   border: 2px solid rgba(255, 255, 255, 0.72);
 }
 
+.add-more-action {
+  background: #1473e6;
+  color: #ffffff;
+  border-color: #8dc2ff;
+  box-shadow: 0 10px 24px rgba(10, 73, 155, 0.28);
+}
+
+.add-more-action:hover {
+  background: #0f63c9;
+}
+
+.add-more-action:active {
+  background: #0b52aa;
+}
+
 .text-action {
   min-height: 56px;
   background: transparent;

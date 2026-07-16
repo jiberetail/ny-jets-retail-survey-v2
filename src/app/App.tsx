@@ -942,7 +942,7 @@ function BasketScreen({
         <Row label="Total due at kiosk" value={formatPrice(total)} strong />
       </div>
       <div className="dual-actions">
-        <button className="secondary-action" onClick={onContinueShopping}>
+        <button className="secondary-action add-more-action" onClick={onContinueShopping}>
           Add More
         </button>
         <button className="primary-action" disabled={!cart.length} onClick={onNext}>
