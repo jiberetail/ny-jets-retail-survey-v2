@@ -201,18 +201,19 @@ export default function App() {
   const [category, setCategory] = useState<ProductCategory>("jerseys");
   const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product>(products[0]);
-  const [selectedSize, setSelectedSize] = useState("XL");
+  const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [cart, setCart] = useState<CartLine[]>([]);
-  const [selectedLocation, setSelectedLocation] = useState(pickupLocations[0]);
+  const [selectedLocation, setSelectedLocation] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
-  const [textConsent, setTextConsent] = useState(true);
-  const [ticketContactMethod, setTicketContactMethod] = useState("Text me");
-  const [lostProduct, setLostProduct] = useState(lostDemandProducts[0]);
-  const [lostSize, setLostSize] = useState("M");
-  const [feedbackReason, setFeedbackReason] = useState("The checkout line was too long.");
-  const [associateHelp, setAssociateHelp] = useState("No associate was available");
+  const [textConsent, setTextConsent] = useState(false);
+  const [ticketContactMethod, setTicketContactMethod] = useState("");
+  const [lostProduct, setLostProduct] = useState<Product | null>(null);
+  const [lostSize, setLostSize] = useState("");
+  const [feedbackReason, setFeedbackReason] = useState("");
+  const [associateHelp, setAssociateHelp] = useState("");
   const [confirmationId, setConfirmationId] = useState(buildOrderId(null));
+  const [showStartOverDialog, setShowStartOverDialog] = useState(false);
 
   useEffect(() => {
     const fitStageToViewport = () => {
@@ -244,14 +245,41 @@ export default function App() {
     setCart([]);
     setSelectedProduct(products[0]);
     setSelectedDepartment(null);
-    setSelectedSize("XL");
+    setSelectedSize("");
     setQuantity(1);
+    setSelectedLocation("");
+    setMobileNumber("");
+    setTextConsent(false);
+    setTicketContactMethod("");
+    setLostProduct(null);
+    setLostSize("");
+    setFeedbackReason("");
+    setAssociateHelp("");
+    setShowStartOverDialog(false);
+  };
+
+  const requestHome = () => {
+    if (cart.length) {
+      setShowStartOverDialog(true);
+      return;
+    }
+
+    goHome();
   };
 
   const startFlow = (flow: Flow) => {
     setActiveFlow(flow);
     setCart([]);
     setQuantity(1);
+    setSelectedSize("");
+    setSelectedLocation("");
+    setMobileNumber("");
+    setTextConsent(false);
+    setTicketContactMethod("");
+    setLostProduct(null);
+    setLostSize("");
+    setFeedbackReason("");
+    setAssociateHelp("");
     setConfirmationId(buildOrderId(flow));
     if (flow === "tickets") {
       setScreen("ticket-start");
@@ -292,6 +320,8 @@ export default function App() {
   };
 
   const addProductToCart = () => {
+    if (!selectedSize) return;
+
     setCart((currentCart) => {
       const existing = currentCart.find(
         (line) => line.product.id === selectedProduct.id && line.size === selectedSize,
@@ -310,8 +340,7 @@ export default function App() {
 
   const selectProduct = (product: Product) => {
     setSelectedProduct(product);
-    const firstAvailableSize = product.sizes.find((size) => product.inventory[size] > 0) ?? product.sizes[0];
-    setSelectedSize(firstAvailableSize);
+    setSelectedSize("");
     setQuantity(1);
     setScreen("detail");
   };
@@ -506,12 +535,43 @@ export default function App() {
             screen={screen}
             cartCount={cart.reduce((count, line) => count + line.quantity, 0)}
             onBack={back}
-            onHome={goHome}
+            onHome={requestHome}
           >
             {renderContent()}
           </KioskFrame>
+          {showStartOverDialog && (
+            <StartOverDialog
+              onCancel={() => setShowStartOverDialog(false)}
+              onConfirm={goHome}
+            />
+          )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function StartOverDialog({ onCancel, onConfirm }: { onCancel: () => void; onConfirm: () => void }) {
+  return (
+    <div className="start-over-overlay">
+      <section
+        className="start-over-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="start-over-title"
+        aria-describedby="start-over-copy"
+      >
+        <div className="start-over-icon" aria-hidden="true">
+          <AlertTriangle />
+        </div>
+        <p className="kicker">Start over</p>
+        <h2 id="start-over-title">Your cart will be cleared</h2>
+        <p id="start-over-copy">Are you sure you want to start over?</p>
+        <div className="start-over-actions">
+          <button className="keep-cart-action" onClick={onCancel}>Keep My Cart</button>
+          <button className="clear-cart-action" onClick={onConfirm}>Start Over</button>
+        </div>
+      </section>
     </div>
   );
 }
@@ -858,6 +918,7 @@ function DetailScreen({
                 key={size}
                 className={size === selectedSize ? "size-chip selected" : "size-chip"}
                 onClick={() => onSelectSize(size)}
+                aria-pressed={size === selectedSize}
               >
                 <span>{size}</span>
                 <small>{available ? "Available" : "Unavailable"}</small>
@@ -870,16 +931,18 @@ function DetailScreen({
           <span>{quantity}</span>
           <button onClick={() => onQuantityChange(Math.min(9, quantity + 1))}>+</button>
         </div>
-        <div className="inventory-panel">
-          <BadgeCheck />
+        <div className={selectedSize ? "inventory-panel" : "inventory-panel pending"}>
+          {selectedSize ? <BadgeCheck /> : <ShoppingBag />}
           <div>
-            <strong>Selection confirmed</strong>
+            <strong>{selectedSize ? "Selection confirmed" : "Choose a size"}</strong>
             <span>
-              Size {selectedSize} · {fulfillmentLabel(activeFlow)}.
+              {selectedSize
+                ? `Size ${selectedSize} · ${fulfillmentLabel(activeFlow)}.`
+                : "Select an available size before adding this item."}
             </span>
           </div>
         </div>
-        <button className="primary-action" onClick={onAdd}>
+        <button className="primary-action" disabled={!selectedSize} onClick={onAdd}>
           Add to Basket
         </button>
       </section>
@@ -1016,7 +1079,7 @@ function FulfillmentScreen({
           </div>
         </div>
       )}
-      <button className="primary-action bottom-action" onClick={onNext}>
+      <button className="primary-action bottom-action" disabled={!selectedLocation} onClick={onNext}>
         Continue
       </button>
     </div>
@@ -1319,8 +1382,8 @@ function TicketLeadScreen({
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");
   const [email, setEmail] = useState("");
-  const hasPreferredContact = contactMethod === "Email me" ? email.trim() : mobile.trim();
-  const canSubmit = Boolean(name.trim() && hasPreferredContact);
+  const hasPreferredContact = contactMethod === "Email me" ? email.trim() : contactMethod ? mobile.trim() : "";
+  const canSubmit = Boolean(contactMethod && name.trim() && hasPreferredContact);
 
   return (
     <div className="content-stack">
@@ -1361,6 +1424,7 @@ function TicketLeadScreen({
             key={method}
             className={contactMethod === method ? "selected" : ""}
             onClick={() => onContactMethod(method)}
+            aria-pressed={contactMethod === method}
           >
             {method}
           </button>
@@ -1414,7 +1478,7 @@ function LostDemandScreen({
   onSize,
   onNext,
 }: {
-  product: Product;
+  product: Product | null;
   size: string;
   onProduct: (product: Product) => void;
   onSize: (size: string) => void;
@@ -1431,8 +1495,9 @@ function LostDemandScreen({
         {lostDemandProducts.map((candidate) => (
           <button
             key={candidate.id}
-            className={product.id === candidate.id ? "selected" : ""}
+            className={product?.id === candidate.id ? "selected" : ""}
             onClick={() => onProduct(candidate)}
+            aria-pressed={product?.id === candidate.id}
           >
             <img src={candidate.image} alt={candidate.name} />
             <span>{candidate.name}</span>
@@ -1445,12 +1510,13 @@ function LostDemandScreen({
             key={candidateSize}
             className={size === candidateSize ? "selected" : ""}
             onClick={() => onSize(candidateSize)}
+            aria-pressed={size === candidateSize}
           >
             {candidateSize}
           </button>
         ))}
       </div>
-      <button className="primary-action bottom-action" onClick={onNext}>
+      <button className="primary-action bottom-action" disabled={!product || !size} onClick={onNext}>
         Continue
       </button>
     </div>
@@ -1484,12 +1550,17 @@ function ExperienceScreen({
       />
       <div className="reason-list">
         {reasons.map((candidate) => (
-          <button key={candidate} className={reason === candidate ? "selected" : ""} onClick={() => onReason(candidate)}>
+          <button
+            key={candidate}
+            className={reason === candidate ? "selected" : ""}
+            onClick={() => onReason(candidate)}
+            aria-pressed={reason === candidate}
+          >
             {candidate}
           </button>
         ))}
       </div>
-      <button className="primary-action bottom-action" onClick={onNext}>
+      <button className="primary-action bottom-action" disabled={!reason} onClick={onNext}>
         Continue
       </button>
     </div>
@@ -1532,7 +1603,7 @@ function AssociateScreen({
           );
         })}
       </div>
-      <button className="primary-action bottom-action" onClick={onComplete}>
+      <button className="primary-action bottom-action" disabled={!associateHelp} onClick={onComplete}>
         Submit Feedback
       </button>
     </div>
@@ -1545,7 +1616,7 @@ function FeedbackConfirmScreen({
   reason,
   associateHelp,
 }: {
-  product: Product;
+  product: Product | null;
   size: string;
   reason: string;
   associateHelp: string;
@@ -1556,7 +1627,7 @@ function FeedbackConfirmScreen({
       <h2>Thank You</h2>
       <p>Your feedback helps the Jets improve merchandise availability and the gameday store experience.</p>
       <div className="confirm-card">
-        <Row label="Missing item" value={product.name} />
+        <Row label="Missing item" value={product?.name ?? "Not provided"} />
         <Row label="Requested size" value={size} />
         <Row label="Experience issue" value={reason} />
         <Row label="Associate response" value={associateHelp} />

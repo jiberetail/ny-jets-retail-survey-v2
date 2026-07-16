@@ -181,6 +181,92 @@ button {
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.24);
 }
 
+.start-over-overlay {
+  position: absolute;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 72px;
+  background: rgba(0, 8, 5, 0.78);
+  backdrop-filter: blur(12px);
+}
+
+.start-over-dialog {
+  width: min(820px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 62px 54px 50px;
+  border: 2px solid rgba(255, 255, 255, 0.78);
+  border-radius: 8px;
+  background: rgba(250, 252, 251, 0.98);
+  color: #06130e;
+  text-align: center;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.48);
+}
+
+.start-over-icon {
+  width: 92px;
+  height: 92px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 24px;
+  border-radius: 50%;
+  background: #fff0d5;
+  color: #a95f00;
+}
+
+.start-over-icon svg {
+  width: 48px;
+  height: 48px;
+}
+
+.start-over-dialog .kicker {
+  color: #125740;
+}
+
+.start-over-dialog h2 {
+  margin: 0;
+  color: #06130e;
+  font-size: 54px;
+  line-height: 1.05;
+  font-weight: 950;
+}
+
+.start-over-dialog > p:last-of-type {
+  margin: 20px 0 0;
+  color: rgba(6, 19, 14, 0.72);
+  font-size: 29px;
+  line-height: 1.25;
+  font-weight: 750;
+}
+
+.start-over-actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 42px;
+}
+
+.start-over-actions button {
+  min-height: 78px;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 26px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.keep-cart-action {
+  background: #4f6f86;
+}
+
+.clear-cart-action {
+  background: #b93535;
+}
+
 .content-stack {
   height: 100%;
   display: flex;
@@ -704,6 +790,14 @@ button {
 .alert-panel svg {
   flex: 0 0 auto;
   color: #125740;
+}
+
+.inventory-panel.pending {
+  background: rgba(238, 243, 240, 0.94);
+}
+
+.inventory-panel.pending svg {
+  color: #4f6f86;
 }
 
 .status-strip span {
