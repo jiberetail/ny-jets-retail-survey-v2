@@ -19,6 +19,7 @@ import {
   ShoppingCart,
   Smartphone,
   Ticket,
+  ThumbsUp,
   Truck,
   Users,
 } from "lucide-react";
@@ -989,17 +990,22 @@ function FulfillmentScreen({
         }
       />
       <div className="option-list">
-        {options.map((option) => (
-          <button
-            key={option}
-            className={selectedLocation === option ? "option-row selected" : "option-row"}
-            onClick={() => onSelectLocation(option)}
-          >
-            <MapPin />
-            <span>{option}</span>
-            <Check />
-          </button>
-        ))}
+        {options.map((option) => {
+          const isSelected = selectedLocation === option;
+
+          return (
+            <button
+              key={option}
+              className={isSelected ? "option-row selected" : "option-row"}
+              onClick={() => onSelectLocation(option)}
+              aria-pressed={isSelected}
+            >
+              <MapPin />
+              <span>{option}</span>
+              <SelectionMark selected={isSelected} />
+            </button>
+          );
+        })}
       </div>
       {activeFlow === "ship" && (
         <div className="info-panel">
@@ -1055,8 +1061,12 @@ function MobileConsentScreen({
           />
         </label>
       </div>
-      <button className={textConsent ? "consent-card selected" : "consent-card"} onClick={() => onConsentChange(!textConsent)}>
-        <Check />
+      <button
+        className={textConsent ? "consent-card selected" : "consent-card"}
+        onClick={() => onConsentChange(!textConsent)}
+        aria-pressed={textConsent}
+      >
+        <SelectionMark selected={textConsent} />
         <span>
           I agree to receive order updates by text message from New York Jets game day retail.
           Message and data rates may apply.
@@ -1383,7 +1393,7 @@ function FeedbackStartScreen({ onFound, onMissing }: { onFound: () => void; onMi
       />
       <div className="dual-choice">
         <button onClick={onFound}>
-          <Check />
+          <ThumbsUp />
           <strong>Yes</strong>
           <span>I found what I wanted</span>
         </button>
@@ -1505,17 +1515,22 @@ function AssociateScreen({
         copy="Your feedback helps us deliver better game day service."
       />
       <div className="option-list">
-        {options.map((option) => (
-          <button
-            key={option}
-            className={associateHelp === option ? "option-row selected" : "option-row"}
-            onClick={() => onAssociateHelp(option)}
-          >
-            <Users />
-            <span>{option}</span>
-            <Check />
-          </button>
-        ))}
+        {options.map((option) => {
+          const isSelected = associateHelp === option;
+
+          return (
+            <button
+              key={option}
+              className={isSelected ? "option-row selected" : "option-row"}
+              onClick={() => onAssociateHelp(option)}
+              aria-pressed={isSelected}
+            >
+              <Users />
+              <span>{option}</span>
+              <SelectionMark selected={isSelected} />
+            </button>
+          );
+        })}
       </div>
       <button className="primary-action bottom-action" onClick={onComplete}>
         Submit Feedback
@@ -1547,6 +1562,14 @@ function FeedbackConfirmScreen({
         <Row label="Associate response" value={associateHelp} />
       </div>
     </div>
+  );
+}
+
+function SelectionMark({ selected }: { selected: boolean }) {
+  return (
+    <span className="selection-mark" aria-hidden="true">
+      {selected ? <Check size={24} strokeWidth={3} /> : null}
+    </span>
   );
 }
 

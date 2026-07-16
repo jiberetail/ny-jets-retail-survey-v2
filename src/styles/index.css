@@ -1283,6 +1283,24 @@ button {
   font-weight: 950;
 }
 
+.selection-mark,
+.option-row .selection-mark,
+.consent-card .selection-mark {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 2px solid currentColor;
+  border-radius: 8px;
+  font-size: 0;
+  opacity: 0.34;
+}
+
+.selected .selection-mark {
+  background: rgba(255, 255, 255, 0.15);
+  opacity: 1;
+}
+
 .reason-list button {
   display: block;
   min-height: 94px;
