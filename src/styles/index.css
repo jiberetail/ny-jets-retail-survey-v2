@@ -1220,18 +1220,18 @@ button {
 }
 
 .add-more-action {
-  background: #1473e6;
+  background: #4f6f86;
   color: #ffffff;
-  border-color: #8dc2ff;
-  box-shadow: 0 10px 24px rgba(10, 73, 155, 0.28);
+  border-color: #9db2c1;
+  box-shadow: 0 10px 24px rgba(37, 62, 79, 0.28);
 }
 
 .add-more-action:hover {
-  background: #0f63c9;
+  background: #435f74;
 }
 
 .add-more-action:active {
-  background: #0b52aa;
+  background: #374f61;
 }
 
 .text-action {
