@@ -596,9 +596,17 @@ function KioskFrame({
 
   return (
     <div className={isHome ? "kiosk-frame home-mode" : "kiosk-frame"}>
-      <video className="kiosk-video" autoPlay loop muted playsInline>
-        <source src={background} type="video/mp4" />
-      </video>
+      <video
+        key={isHome ? "splash-background" : "grass-background"}
+        className="kiosk-video"
+        src={background}
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        aria-hidden="true"
+      />
       <div className="kiosk-scrim" />
       {!isHome && (
         <div className="top-nav">
