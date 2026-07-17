@@ -1809,6 +1809,52 @@ button {
   font-weight: 800;
 }
 
+.language-picker {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 30px 48px 48px;
+  align-items: center;
+  gap: 4px;
+  min-height: 46px;
+  padding: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  background: rgba(1, 12, 8, 0.76);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(10px);
+}
+
+.language-picker > svg {
+  width: 22px;
+  height: 22px;
+  margin: auto;
+  color: #c8f5db;
+}
+
+.language-picker button {
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 17px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.language-picker button.selected {
+  background: #ffffff;
+  color: #125740;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+}
+
+.language-picker button:focus-visible {
+  outline: 3px solid #53d98d;
+  outline-offset: 1px;
+}
+
 .home-service-menu {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;

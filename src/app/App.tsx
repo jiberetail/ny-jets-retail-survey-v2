@@ -11,6 +11,7 @@ import {
   CreditCard,
   Grid3X3,
   Home,
+  Languages,
   MapPin,
   PackageCheck,
   QrCode,
@@ -28,6 +29,7 @@ import logoSrc from "../imports/new-york-jets-logo-0-1.png";
 import heroVideo from "../imports/grok-video-9e94842e-7a91-4f32-8ace-1e4f9bb82a22.mp4";
 import fieldVideo from "../imports/grok-video-67c07eb1-53de-4b2d-bf02-0ebcdcc7e644.mp4";
 import shopCatalogData from "../data/jets-shop-catalog.json";
+import { useV2Language, type V2Translate } from "./contexts/V2LanguageContext";
 
 const STAGE_WIDTH = 1080;
 const STAGE_HEIGHT = 1920;
@@ -174,19 +176,27 @@ function formatPrice(value: number) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
 }
 
-function flowTitle(flow: Flow | null) {
-  if (flow === "concierge") return "Concierge Merchandise Pickup";
-  if (flow === "suite") return "Suite Delivery";
-  if (flow === "ship") return "Ship-to-Home Ordering";
-  if (flow === "tickets") return "Season-Ticket Interest";
-  if (flow === "feedback") return "Team-Store Feedback";
-  return "Jets Retail Kiosk";
+function flowTitle(flow: Flow | null, t: V2Translate) {
+  if (flow === "concierge") return t("Concierge Merchandise Pickup");
+  if (flow === "suite") return t("Suite Delivery");
+  if (flow === "ship") return t("Ship-to-Home Ordering");
+  if (flow === "tickets") return t("Season-Ticket Interest");
+  if (flow === "feedback") return t("Team-Store Feedback");
+  return t("Jets Retail Kiosk");
 }
 
-function fulfillmentLabel(flow: MerchFlow | null) {
-  if (flow === "suite") return "Delivery to suite";
-  if (flow === "ship") return "Ship to home";
-  return "Pickup at stadium desk";
+function fulfillmentLabel(flow: MerchFlow | null, t: V2Translate) {
+  if (flow === "suite") return t("Delivery to suite");
+  if (flow === "ship") return t("Ship to home");
+  return t("Pickup at stadium desk");
+}
+
+function merchandiseBadgeLabel(badge: string, t: V2Translate) {
+  if (badge.endsWith("% off")) {
+    return t("{discount} off", { discount: badge.replace(" off", "") });
+  }
+
+  return t(badge);
 }
 
 function buildOrderId(flow: Flow | null) {
@@ -552,6 +562,8 @@ export default function App() {
 }
 
 function StartOverDialog({ onCancel, onConfirm }: { onCancel: () => void; onConfirm: () => void }) {
+  const { t } = useV2Language();
+
   return (
     <div className="start-over-overlay">
       <section
@@ -564,12 +576,12 @@ function StartOverDialog({ onCancel, onConfirm }: { onCancel: () => void; onConf
         <div className="start-over-icon" aria-hidden="true">
           <AlertTriangle />
         </div>
-        <p className="kicker">Start over</p>
-        <h2 id="start-over-title">Your cart will be cleared</h2>
-        <p id="start-over-copy">Are you sure you want to start over?</p>
+        <p className="kicker">{t("Start over")}</p>
+        <h2 id="start-over-title">{t("Your cart will be cleared")}</h2>
+        <p id="start-over-copy">{t("Are you sure you want to start over?")}</p>
         <div className="start-over-actions">
-          <button className="keep-cart-action" onClick={onCancel}>Keep My Cart</button>
-          <button className="clear-cart-action" onClick={onConfirm}>Start Over</button>
+          <button className="keep-cart-action" onClick={onCancel}>{t("Keep My Cart")}</button>
+          <button className="clear-cart-action" onClick={onConfirm}>{t("Start Over")}</button>
         </div>
       </section>
     </div>
@@ -591,6 +603,7 @@ function KioskFrame({
   onHome: () => void;
   children: ReactNode;
 }) {
+  const { t } = useV2Language();
   const isHome = screen === "home";
   const background = isHome ? heroVideo : fieldVideo;
 
@@ -610,14 +623,14 @@ function KioskFrame({
       <div className="kiosk-scrim" />
       {!isHome && (
         <div className="top-nav">
-          <button className="round-button" onClick={onBack} aria-label="Back">
+          <button className="round-button" onClick={onBack} aria-label={t("Back")}>
             <ArrowLeft />
           </button>
           <div className="nav-title">
             <img src={logoSrc} alt="New York Jets" />
-            <span>{flowTitle(activeFlow)}</span>
+            <span>{flowTitle(activeFlow, t)}</span>
           </div>
-          <button className="round-button" onClick={onHome} aria-label="Home">
+          <button className="round-button" onClick={onHome} aria-label={t("Home")}>
             <Home />
           </button>
         </div>
@@ -634,6 +647,8 @@ function KioskFrame({
 }
 
 function HomeScreen({ onStart }: { onStart: (flow: Flow) => void }) {
+  const { language, setLanguage, t } = useV2Language();
+
   return (
     <>
       <section className="home-hero">
@@ -642,16 +657,35 @@ function HomeScreen({ onStart }: { onStart: (flow: Flow) => void }) {
           <MapPin size={28} />
           <span>MetLife Stadium</span>
         </div>
-        <p className="kicker">Jets Game Day</p>
+        <p className="kicker">{t("Jets Game Day")}</p>
         <h1>
-          <span>Elevate Your Jets</span>
-          <span>Game Day</span>
+          <span>{t("Elevate Your Jets")}</span>
+          <span>{t("Game Day")}</span>
         </h1>
-        <p>Shop smarter, enjoy premium service, and get more from every moment at MetLife Stadium.</p>
+        <p>{t("Shop smarter, enjoy premium service, and get more from every moment at MetLife Stadium.")}</p>
       </section>
-      <section className="home-services" aria-label="Choose a Jets game day service">
+      <section className="home-services" aria-label={t("Choose a Jets game day service")}>
         <header>
-          <strong>What would you like to do?</strong>
+          <strong>{t("What would you like to do?")}</strong>
+          <div className="language-picker" role="group" aria-label={t("Language")}>
+            <Languages aria-hidden="true" />
+            <button
+              className={language === "en" ? "selected" : ""}
+              onClick={() => setLanguage("en")}
+              aria-label={t("English")}
+              aria-pressed={language === "en"}
+            >
+              EN
+            </button>
+            <button
+              className={language === "es" ? "selected" : ""}
+              onClick={() => setLanguage("es")}
+              aria-label={t("Spanish")}
+              aria-pressed={language === "es"}
+            >
+              ES
+            </button>
+          </div>
         </header>
         <div className="home-service-menu">
           {flowCards.map(({ flow, eyebrow, title, description, action, Icon }) => (
@@ -660,12 +694,12 @@ function HomeScreen({ onStart }: { onStart: (flow: Flow) => void }) {
                 <Icon size={48} />
               </div>
               <div className="service-copy">
-                <span>{eyebrow}</span>
-                <strong>{title}</strong>
-                <p>{description}</p>
+                <span>{t(eyebrow)}</span>
+                <strong>{t(title)}</strong>
+                <p>{t(description)}</p>
               </div>
               <div className="service-action">
-                <span>{action}</span>
+                <span>{t(action)}</span>
                 <ChevronRight size={34} />
               </div>
             </button>
@@ -674,7 +708,7 @@ function HomeScreen({ onStart }: { onStart: (flow: Flow) => void }) {
       </section>
       <div className="home-footer-strip">
         <BadgeCheck size={26} />
-        <span>Official New York Jets game day services</span>
+        <span>{t("Official New York Jets game day services")}</span>
       </div>
     </>
   );
@@ -693,6 +727,7 @@ function CategoryScreen({
   onSelectCategory: (category: ProductCategory) => void;
   onAllDepartments: () => void;
 }) {
+  const { t } = useV2Language();
   const featured = Object.fromEntries(
     categories.map((category) => {
       const featuredProduct = category.id === "jerseys"
@@ -711,26 +746,26 @@ function CategoryScreen({
   return (
     <div className="content-stack category-screen">
       <ScreenHeader
-        kicker={fulfillmentLabel(activeFlow)}
-        title="Find Your Jets Gear"
-        copy="Featured categories and every Jets Shop department."
+        kicker={fulfillmentLabel(activeFlow, t)}
+        title={t("Find Your Jets Gear")}
+        copy={t("Featured categories and every Jets Shop department.")}
       />
       <div className="catalog-toolbar">
         <div className="catalog-ready">
           <BadgeCheck />
           <div>
-            <strong>{shopCatalog.catalogProductCount.toLocaleString()} products</strong>
-            <span>Ready to browse</span>
+            <strong>{t("{count} products", { count: shopCatalog.catalogProductCount.toLocaleString() })}</strong>
+            <span>{t("Ready to browse")}</span>
           </div>
         </div>
         <div className="catalog-toolbar-actions">
-          <div className="catalog-cart-count" aria-label={`${cartCount} items in basket`}>
+          <div className="catalog-cart-count" aria-label={t("{count} items in basket", { count: cartCount })}>
             <ShoppingCart />
             <span>{cartCount}</span>
           </div>
           <button className="departments-button" onClick={onAllDepartments}>
             <Grid3X3 />
-            <span>All Departments</span>
+            <span>{t("All Departments")}</span>
             <small>{shopCatalog.departments.length}</small>
             <ChevronRight />
           </button>
@@ -739,9 +774,9 @@ function CategoryScreen({
       <div className="category-grid">
         {categories.map((category) => (
           <button key={category.id} className="category-card" onClick={() => onSelectCategory(category.id)}>
-            <img src={featured[category.id]} alt={category.label} />
-            <span>{category.label}</span>
-            <small>{products.filter((product) => product.categories.includes(category.id)).length.toLocaleString()} items</small>
+            <img src={featured[category.id]} alt={t(category.label)} />
+            <span>{t(category.label)}</span>
+            <small>{t("{count} items", { count: products.filter((product) => product.categories.includes(category.id)).length.toLocaleString() })}</small>
           </button>
         ))}
       </div>
@@ -756,12 +791,14 @@ function DepartmentsScreen({
   departments: Department[];
   onSelectDepartment: (department: Department) => void;
 }) {
+  const { t } = useV2Language();
+
   return (
     <div className="content-stack departments-screen">
       <ScreenHeader
-        kicker="All Departments"
-        title="Shop Every Department"
-        copy="All Jets Shop categories in one place."
+        kicker={t("All Departments")}
+        title={t("Shop Every Department")}
+        copy={t("All Jets Shop categories in one place.")}
       />
       <div className="department-grid">
         {departments.map((department) => {
@@ -771,8 +808,8 @@ function DepartmentsScreen({
             <button key={department.id} className="department-card" onClick={() => onSelectDepartment(department)}>
               {featuredProduct && <img src={featuredProduct.image} alt="" />}
               <div>
-                <strong>{department.label}</strong>
-                <span>{availableCount.toLocaleString()} items</span>
+                <strong>{t(department.label)}</strong>
+                <span>{t("{count} items", { count: availableCount.toLocaleString() })}</span>
               </div>
               <ChevronRight />
             </button>
@@ -798,7 +835,8 @@ function ProductsScreen({
   onBackToSelection: () => void;
   onBasket: () => void;
 }) {
-  const title = department?.label ?? categoryLabels[category];
+  const { t } = useV2Language();
+  const title = t(department?.label ?? categoryLabels[category]);
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
   const pageSize = 12;
@@ -827,26 +865,26 @@ function ProductsScreen({
   return (
     <div className="content-stack products-screen">
       <ScreenHeader
-        kicker="Browse merchandise"
+        kicker={t("Browse merchandise")}
         title={title}
-        copy={`${productList.length.toLocaleString()} products available to browse.`}
+        copy={t("{count} products available to browse.", { count: productList.length.toLocaleString() })}
       />
       <div className="catalog-controls">
         <label className="search-bar">
           <Search size={30} />
           <input
             type="search"
-            aria-label={`Search ${title}`}
+            aria-label={t("Search {title}", { title })}
             autoComplete="off"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search player, product, brand or style"
+            placeholder={t("Search player, product, brand or style")}
           />
           <span>{filteredProducts.length.toLocaleString()}</span>
         </label>
-        <div className="page-controls" aria-label="Catalog pages">
+        <div className="page-controls" aria-label={t("Catalog pages")}>
           <button
-            aria-label="Previous product page"
+            aria-label={t("Previous product page")}
             disabled={page === 0}
             onClick={() => setPage((currentPage) => Math.max(0, currentPage - 1))}
           >
@@ -854,7 +892,7 @@ function ProductsScreen({
           </button>
           <span>{page + 1} / {pageCount}</span>
           <button
-            aria-label="Next product page"
+            aria-label={t("Next product page")}
             disabled={page + 1 >= pageCount}
             onClick={() => setPage((currentPage) => Math.min(pageCount - 1, currentPage + 1))}
           >
@@ -866,7 +904,7 @@ function ProductsScreen({
         {pageProducts.length ? (
           pageProducts.map((product) => (
             <button key={product.id} className="product-card" onClick={() => onSelectProduct(product)}>
-              {product.badges?.[0] && <small className="product-badge">{product.badges[0]}</small>}
+              {product.badges?.[0] && <small className="product-badge">{merchandiseBadgeLabel(product.badges[0], t)}</small>}
               <img src={product.image} alt={product.name} />
               <strong>{product.name}</strong>
               <div className="product-price">
@@ -880,17 +918,17 @@ function ProductsScreen({
         ) : (
           <div className="empty-state product-empty">
             <Search size={66} />
-            <strong>No matching products</strong>
-            <span>Try a player name, product type, brand or style.</span>
+            <strong>{t("No matching products")}</strong>
+            <span>{t("Try a player name, product type, brand or style.")}</span>
           </div>
         )}
       </div>
       <div className="product-actions">
         <button className="secondary-action" onClick={onBackToSelection}>
-          Back to Selection
+          {t("Back to Selection")}
         </button>
         <button className="primary-action" onClick={onBasket}>
-          Review Basket
+          {t("Review Basket")}
         </button>
       </div>
     </div>
@@ -914,6 +952,8 @@ function DetailScreen({
   onQuantityChange: (quantity: number) => void;
   onAdd: () => void;
 }) {
+  const { t } = useV2Language();
+
   return (
     <div className="detail-layout">
       <img className="detail-image" src={product.image} alt={product.name} />
@@ -922,7 +962,7 @@ function DetailScreen({
         <h2>{product.name}</h2>
         <div className="price-row">
           <strong>{product.priceDisplay ?? formatPrice(product.price)}</strong>
-          <span>{product.genderFit}</span>
+          <span>{t(product.genderFit)}</span>
         </div>
         <div className="size-grid">
           {product.sizes.map((size) => {
@@ -935,7 +975,7 @@ function DetailScreen({
                 aria-pressed={size === selectedSize}
               >
                 <span>{size}</span>
-                <small>{available ? "Available" : "Unavailable"}</small>
+                <small>{available ? t("Available") : t("Unavailable")}</small>
               </button>
             );
           })}
@@ -948,16 +988,16 @@ function DetailScreen({
         <div className={selectedSize ? "inventory-panel" : "inventory-panel pending"}>
           {selectedSize ? <BadgeCheck /> : <ShoppingBag />}
           <div>
-            <strong>{selectedSize ? "Selection confirmed" : "Choose a size"}</strong>
+            <strong>{selectedSize ? t("Selection confirmed") : t("Choose a size")}</strong>
             <span>
               {selectedSize
-                ? `Size ${selectedSize} · ${fulfillmentLabel(activeFlow)}.`
-                : "Select an available size before adding this item."}
+                ? t("Size {size} · {fulfillment}.", { size: selectedSize, fulfillment: fulfillmentLabel(activeFlow, t) })
+                : t("Select an available size before adding this item.")}
             </span>
           </div>
         </div>
         <button className="primary-action" disabled={!selectedSize} onClick={onAdd}>
-          Add to Basket
+          {t("Add to Basket")}
         </button>
       </section>
     </div>
@@ -983,19 +1023,21 @@ function BasketScreen({
   onRemove: (index: number) => void;
   onNext: () => void;
 }) {
+  const { t } = useV2Language();
+
   return (
     <div className="content-stack basket-screen">
       <ScreenHeader
-        kicker="Review order"
-        title="Your Basket"
-        copy="Review your items and fulfillment details before payment."
+        kicker={t("Review order")}
+        title={t("Your Basket")}
+        copy={t("Review your items and fulfillment details before payment.")}
       />
       <div className="basket-list">
         {cart.length === 0 ? (
           <div className="empty-state">
             <ShoppingBag size={56} />
-            <strong>No items yet</strong>
-            <span>Add merchandise to build this order.</span>
+            <strong>{t("No items yet")}</strong>
+            <span>{t("Add merchandise to build this order.")}</span>
           </div>
         ) : (
           cart.map((line, index) => (
@@ -1004,32 +1046,38 @@ function BasketScreen({
               <div className="basket-line-copy">
                 <strong>{line.product.name}</strong>
                 <span>
-                  Size {line.size} · Qty {line.quantity} · {fulfillmentLabel(activeFlow)}
+                  {t("Size {size} · Qty {quantity} · {fulfillment}", {
+                    size: line.size,
+                    quantity: line.quantity,
+                    fulfillment: fulfillmentLabel(activeFlow, t),
+                  })}
                 </span>
-                <small>Ready for checkout</small>
+                <small>{t("Ready for checkout")}</small>
               </div>
               <div className="basket-line-price">
-                <span>Each</span>
+                <span>{t("Each")}</span>
                 <strong>{formatPrice(line.product.price)}</strong>
-                {line.quantity > 1 && <small>{formatPrice(line.product.price * line.quantity)} item total</small>}
+                {line.quantity > 1 && (
+                  <small>{t("{price} item total", { price: formatPrice(line.product.price * line.quantity) })}</small>
+                )}
               </div>
-              <button onClick={() => onRemove(index)}>Remove</button>
+              <button onClick={() => onRemove(index)}>{t("Remove")}</button>
             </div>
           ))
         )}
       </div>
       <div className="totals-panel">
-        <Row label="Subtotal" value={formatPrice(subtotal)} />
-        <Row label="Shipping / delivery" value={deliveryFee ? formatPrice(deliveryFee) : "Included"} />
-        <Row label="Estimated tax" value={formatPrice(subtotal * 0.06625)} />
-        <Row label="Total due at kiosk" value={formatPrice(total)} strong />
+        <Row label={t("Subtotal")} value={formatPrice(subtotal)} />
+        <Row label={t("Shipping / delivery")} value={deliveryFee ? formatPrice(deliveryFee) : t("Included")} />
+        <Row label={t("Estimated tax")} value={formatPrice(subtotal * 0.06625)} />
+        <Row label={t("Total due at kiosk")} value={formatPrice(total)} strong />
       </div>
       <div className="dual-actions">
         <button className="secondary-action add-more-action" onClick={onContinueShopping}>
-          Add More
+          {t("Add More")}
         </button>
         <button className="primary-action" disabled={!cart.length} onClick={onNext}>
-          Continue
+          {t("Continue")}
         </button>
       </div>
     </div>
@@ -1047,6 +1095,7 @@ function FulfillmentScreen({
   onSelectLocation: (location: string) => void;
   onNext: () => void;
 }) {
+  const { t } = useV2Language();
   const options =
     activeFlow === "suite"
       ? suiteLocations
@@ -1057,18 +1106,18 @@ function FulfillmentScreen({
   return (
     <div className="content-stack">
       <ScreenHeader
-        kicker="Fulfillment"
+        kicker={t("Fulfillment")}
         title={
           activeFlow === "suite"
-            ? "Confirm Suite Delivery"
+            ? t("Confirm Suite Delivery")
             : activeFlow === "ship"
-              ? "Choose Shipping Details"
-              : "Choose Pickup Location"
+              ? t("Choose Shipping Details")
+              : t("Choose Pickup Location")
         }
         copy={
           activeFlow === "ship"
-            ? "Choose how you would like to provide a secure shipping address."
-            : "Choose the most convenient location for your order."
+            ? t("Choose how you would like to provide a secure shipping address.")
+            : t("Choose the most convenient location for your order.")
         }
       />
       <div className="option-list">
@@ -1083,7 +1132,7 @@ function FulfillmentScreen({
               aria-pressed={isSelected}
             >
               <MapPin />
-              <span>{option}</span>
+              <span>{t(option)}</span>
               <SelectionMark selected={isSelected} />
             </button>
           );
@@ -1093,13 +1142,13 @@ function FulfillmentScreen({
         <div className="info-panel">
           <Truck />
           <div>
-            <strong>Estimated delivery: 3-5 business days</strong>
-            <span>Shipping cost and delivery window are displayed before payment.</span>
+            <strong>{t("Estimated delivery: 3-5 business days")}</strong>
+            <span>{t("Shipping cost and delivery window are displayed before payment.")}</span>
           </div>
         </div>
       )}
       <button className="primary-action bottom-action" disabled={!selectedLocation} onClick={onNext}>
-        Continue
+        {t("Continue")}
       </button>
     </div>
   );
@@ -1120,21 +1169,23 @@ function MobileConsentScreen({
   onConsentChange: (value: boolean) => void;
   onNext: () => void;
 }) {
+  const { t } = useV2Language();
+
   return (
     <div className="content-stack">
       <ScreenHeader
-        kicker="Notifications"
-        title="Where Should We Text Updates?"
+        kicker={t("Notifications")}
+        title={t("Where Should We Text Updates?")}
         copy={
           activeFlow === "ship"
-            ? "We will send your receipt now and tracking details when your order ships."
-            : "We will text you as soon as your order is ready."
+            ? t("We will send your receipt now and tracking details when your order ships.")
+            : t("We will text you as soon as your order is ready.")
         }
       />
       <div className="phone-panel">
         <Smartphone size={72} />
         <label>
-          Mobile number
+          {t("Mobile number")}
           <input
             type="tel"
             value={mobileNumber}
@@ -1150,12 +1201,11 @@ function MobileConsentScreen({
       >
         <SelectionMark selected={textConsent} />
         <span>
-          I agree to receive order updates by text message from New York Jets game day retail.
-          Message and data rates may apply.
+          {t("I agree to receive order updates by text message from New York Jets game day retail. Message and data rates may apply.")}
         </span>
       </button>
       <button className="primary-action bottom-action" disabled={!textConsent || !mobileNumber.trim()} onClick={onNext}>
-        Continue to Payment
+        {t("Continue to Payment")}
       </button>
     </div>
   );
@@ -1172,29 +1222,30 @@ function PaymentScreen({
   orderId: string;
   onComplete: () => void;
 }) {
+  const { t } = useV2Language();
   const receiptUrl = `${window.location.origin}${window.location.pathname}?order=${orderId}`;
 
   return (
     <div className="content-stack">
       <ScreenHeader
-        kicker="Kiosk payment"
-        title="Tap or Insert Card"
-        copy="Use the payment terminal below to securely complete your order."
+        kicker={t("Kiosk payment")}
+        title={t("Tap or Insert Card")}
+        copy={t("Use the payment terminal below to securely complete your order.")}
       />
       <div className="payment-card">
         <CreditCard size={96} />
         <strong>{formatPrice(total)}</strong>
-        <span>{fulfillmentLabel(activeFlow)} · Order {orderId}</span>
+        <span>{t("{fulfillment} · Order {orderId}", { fulfillment: fulfillmentLabel(activeFlow, t), orderId })}</span>
       </div>
       <div className="qr-status">
         <QRCodeSVG value={receiptUrl} size={170} bgColor="#ffffff" fgColor={jetsGreen} />
         <div>
-          <strong>Receipt and order status</strong>
-          <span>Scan after payment to keep your order details.</span>
+          <strong>{t("Receipt and order status")}</strong>
+          <span>{t("Scan after payment to keep your order details.")}</span>
         </div>
       </div>
       <button className="primary-action" onClick={onComplete}>
-        Pay {formatPrice(total)}
+        {t("Pay {total}", { total: formatPrice(total) })}
       </button>
     </div>
   );
@@ -1215,6 +1266,7 @@ function ConfirmationScreen({
   total: number;
   onClose: () => void;
 }) {
+  const { t } = useV2Language();
   const [secondsRemaining, setSecondsRemaining] = useState(10);
 
   useEffect(() => {
@@ -1233,25 +1285,25 @@ function ConfirmationScreen({
 
   const message =
     activeFlow === "suite"
-      ? `Your order is paid and will be delivered to ${selectedLocation} by stadium personnel.`
+      ? t("Your order is paid and will be delivered to {location} by stadium personnel.", { location: t(selectedLocation) })
       : activeFlow === "ship"
-        ? "Your order is confirmed and will be packed for shipment."
-        : `Your order is being prepared and will be available at the ${selectedLocation}.`;
+        ? t("Your order is confirmed and will be packed for shipment.")
+        : t("Your order is being prepared and will be available at the {location}.", { location: t(selectedLocation) });
 
   return (
     <div className="confirm-screen">
       <BadgeCheck size={120} />
-      <h2>Order Confirmed</h2>
+      <h2>{t("Order Confirmed")}</h2>
       <p>{message}</p>
       <div className="confirm-card">
-        <Row label="Order number" value={orderId} strong />
-        <Row label="Total paid" value={formatPrice(total)} />
-        <Row label="Text updates" value={mobileNumber} />
-        <Row label="Estimated ready time" value={activeFlow === "ship" ? "Tracking sent when packed" : "18-22 minutes"} />
+        <Row label={t("Order number")} value={orderId} strong />
+        <Row label={t("Total paid")} value={formatPrice(total)} />
+        <Row label={t("Text updates")} value={mobileNumber} />
+        <Row label={t("Estimated ready time")} value={activeFlow === "ship" ? t("Tracking sent when packed") : t("18-22 minutes")} />
       </div>
       <div className="confirmation-exit">
-        <span>Returning to the start in {secondsRemaining} seconds</span>
-        <button className="primary-action" onClick={onClose}>Close</button>
+        <span>{t("Returning to the start in {seconds} seconds", { seconds: secondsRemaining })}</span>
+        <button className="primary-action" onClick={onClose}>{t("Close")}</button>
       </div>
     </div>
   );
@@ -1266,6 +1318,7 @@ function InventoryErrorScreen({
   onChooseAlternative: (product: Product) => void;
   onBackToBasket: () => void;
 }) {
+  const { t } = useV2Language();
   const alternatives = products
     .filter(
       (candidate) =>
@@ -1277,15 +1330,15 @@ function InventoryErrorScreen({
   return (
     <div className="content-stack">
       <ScreenHeader
-        kicker="Inventory issue"
-        title="Size Unavailable"
-        copy={`${product.name} is unavailable in one requested size. The kiosk blocks checkout and offers alternatives before payment.`}
+        kicker={t("Inventory issue")}
+        title={t("Size Unavailable")}
+        copy={t("{product} is unavailable in one requested size. The kiosk blocks checkout and offers alternatives before payment.", { product: product.name })}
       />
       <div className="alert-panel">
         <AlertTriangle size={72} />
         <div>
-          <strong>Unable to reserve selected item</strong>
-          <span>Size M now shows 0 available at this location.</span>
+          <strong>{t("Unable to reserve selected item")}</strong>
+          <span>{t("Size M now shows 0 available at this location.")}</span>
         </div>
       </div>
       <div className="alternative-grid">
@@ -1298,72 +1351,78 @@ function InventoryErrorScreen({
         ))}
       </div>
       <button className="secondary-action bottom-action" onClick={onBackToBasket}>
-        Back to Basket
+        {t("Back to Basket")}
       </button>
     </div>
   );
 }
 
 function PaymentErrorScreen({ onRetry, onAssist }: { onRetry: () => void; onAssist: () => void }) {
+  const { t } = useV2Language();
+
   return (
     <div className="content-stack">
       <ScreenHeader
-        kicker="Payment issue"
-        title="Payment Not Approved"
-        copy="The order is preserved for a quick retry. Assisted checkout is available as a fallback."
+        kicker={t("Payment issue")}
+        title={t("Payment Not Approved")}
+        copy={t("The order is preserved for a quick retry. Assisted checkout is available as a fallback.")}
       />
       <div className="alert-panel">
         <CreditCard size={72} />
         <div>
-          <strong>Card reader declined the transaction</strong>
-          <span>No payment was captured. Inventory hold remains active for 6 minutes.</span>
+          <strong>{t("Card reader declined the transaction")}</strong>
+          <span>{t("No payment was captured. Inventory hold remains active for 6 minutes.")}</span>
         </div>
       </div>
       <button className="primary-action" onClick={onRetry}>
-        Try Payment Again
+        {t("Try Payment Again")}
       </button>
       <button className="secondary-action" onClick={onAssist}>
-        Generate Assisted Checkout Code
+        {t("Generate Assisted Checkout Code")}
       </button>
     </div>
   );
 }
 
 function AssistCodeScreen({ orderId, onDone }: { orderId: string; onDone: () => void }) {
+  const { t } = useV2Language();
+
   return (
     <div className="content-stack">
       <ScreenHeader
-        kicker="Need help?"
-        title="Assisted Checkout Code"
-        copy="The fan presents this code at a concierge or merchandise desk. An associate accepts payment and submits the order."
+        kicker={t("Need help?")}
+        title={t("Assisted Checkout Code")}
+        copy={t("The fan presents this code at a concierge or merchandise desk. An associate accepts payment and submits the order.")}
       />
       <div className="code-card">
         <span>{orderId.replace("JETS", "DN")}</span>
         <QRCodeSVG value={`assisted-checkout:${orderId}`} size={230} bgColor="#ffffff" fgColor={jetsGreen} />
       </div>
       <button className="primary-action bottom-action" onClick={onDone}>
-        Complete Order
+        {t("Complete Order")}
       </button>
     </div>
   );
 }
 
 function TicketStartScreen({ onLead, onQr }: { onLead: () => void; onQr: () => void }) {
+  const { t } = useV2Language();
+
   return (
     <div className="content-stack ticket-screen">
       <ScreenHeader
-        kicker="Jets official ticketing"
-        title="Interested in Becoming a Season-Ticket Holder?"
-        copy="Explore season-ticket opportunities or ask a Jets representative to contact you."
+        kicker={t("Jets official ticketing")}
+        title={t("Interested in Becoming a Season-Ticket Holder?")}
+        copy={t("Explore season-ticket opportunities or ask a Jets representative to contact you.")}
       />
       <button className="big-choice" onClick={onQr}>
         <Ticket />
-        <span>View season-ticket opportunities</span>
+        <span>{t("View season-ticket opportunities")}</span>
         <ChevronRight />
       </button>
       <button className="big-choice" onClick={onLead}>
         <Users />
-        <span>Request contact from a Jets representative</span>
+        <span>{t("Request contact from a Jets representative")}</span>
         <ChevronRight />
       </button>
     </div>
@@ -1371,19 +1430,21 @@ function TicketStartScreen({ onLead, onQr }: { onLead: () => void; onQr: () => v
 }
 
 function TicketQrScreen({ onLead }: { onLead: () => void }) {
+  const { t } = useV2Language();
+
   return (
     <div className="content-stack">
       <ScreenHeader
-        kicker="Season tickets"
-        title="Scan to View Official Jets Options"
-        copy="Fans can continue on the Jets approved ticketing experience or request follow-up."
+        kicker={t("Season tickets")}
+        title={t("Scan to View Official Jets Options")}
+        copy={t("Fans can continue on the Jets approved ticketing experience or request follow-up.")}
       />
       <div className="large-qr-card">
         <QRCodeSVG value={ticketUrl} size={360} bgColor="#ffffff" fgColor={jetsGreen} />
         <span>newyorkjets.com/tickets/season-tickets</span>
       </div>
       <button className="primary-action bottom-action" onClick={onLead}>
-        Request Contact Instead
+        {t("Request Contact Instead")}
       </button>
     </div>
   );
@@ -1398,6 +1459,7 @@ function TicketLeadScreen({
   onContactMethod: (method: string) => void;
   onSubmit: () => void;
 }) {
+  const { t } = useV2Language();
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");
   const [email, setEmail] = useState("");
@@ -1407,33 +1469,33 @@ function TicketLeadScreen({
   return (
     <div className="content-stack">
       <ScreenHeader
-        kicker="Season tickets"
-        title="How Should the Jets Follow Up?"
-        copy="Share your contact information and choose your preferred response."
+        kicker={t("Season tickets")}
+        title={t("How Should the Jets Follow Up?")}
+        copy={t("Share your contact information and choose your preferred response.")}
       />
       <div className="lead-form">
         <label>
-          Name
-          <input autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} placeholder="Full name" />
+          {t("Name")}
+          <input autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} placeholder={t("Full name")} />
         </label>
         <label>
-          Mobile
+          {t("Mobile")}
           <input
             type="tel"
             autoComplete="tel"
             value={mobile}
             onChange={(event) => setMobile(event.target.value)}
-            placeholder="Mobile number"
+            placeholder={t("Mobile number")}
           />
         </label>
         <label>
-          Email
+          {t("Email")}
           <input
             type="email"
             autoComplete="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            placeholder="Email address"
+            placeholder={t("Email address")}
           />
         </label>
       </div>
@@ -1445,45 +1507,49 @@ function TicketLeadScreen({
             onClick={() => onContactMethod(method)}
             aria-pressed={contactMethod === method}
           >
-            {method}
+            {t(method)}
           </button>
         ))}
       </div>
       <button className="primary-action bottom-action" disabled={!canSubmit} onClick={onSubmit}>
-        Submit Interest
+        {t("Submit Interest")}
       </button>
     </div>
   );
 }
 
 function TicketConfirmScreen({ contactMethod }: { contactMethod: string }) {
+  const { t } = useV2Language();
+
   return (
     <div className="confirm-screen">
       <BadgeCheck size={120} />
-      <h2>Interest Submitted</h2>
-      <p>A Jets representative will follow up using the fan's preferred method: {contactMethod}.</p>
+      <h2>{t("Interest Submitted")}</h2>
+      <p>{t("A Jets representative will follow up using the fan's preferred method: {method}.", { method: t(contactMethod) })}</p>
     </div>
   );
 }
 
 function FeedbackStartScreen({ onFound, onMissing }: { onFound: () => void; onMissing: () => void }) {
+  const { t } = useV2Language();
+
   return (
     <div className="content-stack">
       <ScreenHeader
-        kicker="Team Store"
-        title="Did You Find the Merchandise You Were Looking For?"
-        copy="Tell us what worked and where we can help."
+        kicker={t("Team Store")}
+        title={t("Did You Find the Merchandise You Were Looking For?")}
+        copy={t("Tell us what worked and where we can help.")}
       />
       <div className="dual-choice">
         <button onClick={onFound}>
           <ThumbsUp />
-          <strong>Yes</strong>
-          <span>I found what I wanted</span>
+          <strong>{t("Yes")}</strong>
+          <span>{t("I found what I wanted")}</span>
         </button>
         <button onClick={onMissing}>
           <Search />
-          <strong>No</strong>
-          <span>Help identify what was missing</span>
+          <strong>{t("No")}</strong>
+          <span>{t("Help identify what was missing")}</span>
         </button>
       </div>
     </div>
@@ -1503,12 +1569,14 @@ function LostDemandScreen({
   onSize: (size: string) => void;
   onNext: () => void;
 }) {
+  const { t } = useV2Language();
+
   return (
     <div className="content-stack">
       <ScreenHeader
-        kicker="Merchandise search"
-        title="What Were You Looking For?"
-        copy="Choose the closest match, then tell us the size you needed."
+        kicker={t("Merchandise search")}
+        title={t("What Were You Looking For?")}
+        copy={t("Choose the closest match, then tell us the size you needed.")}
       />
       <div className="lost-product-grid">
         {lostDemandProducts.map((candidate) => (
@@ -1536,7 +1604,7 @@ function LostDemandScreen({
         ))}
       </div>
       <button className="primary-action bottom-action" disabled={!product || !size} onClick={onNext}>
-        Continue
+        {t("Continue")}
       </button>
     </div>
   );
@@ -1551,6 +1619,7 @@ function ExperienceScreen({
   onReason: (reason: string) => void;
   onNext: () => void;
 }) {
+  const { t } = useV2Language();
   const reasons = [
     "The checkout line was too long.",
     "The store was too crowded.",
@@ -1563,9 +1632,9 @@ function ExperienceScreen({
   return (
     <div className="content-stack">
       <ScreenHeader
-        kicker="Shopping experience"
-        title="Did We Make Shopping Easy?"
-        copy="Let us know what would have made your visit better."
+        kicker={t("Shopping experience")}
+        title={t("Did We Make Shopping Easy?")}
+        copy={t("Let us know what would have made your visit better.")}
       />
       <div className="reason-list">
         {reasons.map((candidate) => (
@@ -1575,12 +1644,12 @@ function ExperienceScreen({
             onClick={() => onReason(candidate)}
             aria-pressed={reason === candidate}
           >
-            {candidate}
+            {t(candidate)}
           </button>
         ))}
       </div>
       <button className="primary-action bottom-action" disabled={!reason} onClick={onNext}>
-        Continue
+        {t("Continue")}
       </button>
     </div>
   );
@@ -1595,14 +1664,15 @@ function AssociateScreen({
   onAssociateHelp: (value: string) => void;
   onComplete: () => void;
 }) {
+  const { t } = useV2Language();
   const options = ["Satisfied with assistance", "No associate was available", "Not satisfied with assistance"];
 
   return (
     <div className="content-stack">
       <ScreenHeader
-        kicker="Associate interaction"
-        title="Did You Interact with a Store Associate?"
-        copy="Your feedback helps us deliver better game day service."
+        kicker={t("Associate interaction")}
+        title={t("Did You Interact with a Store Associate?")}
+        copy={t("Your feedback helps us deliver better game day service.")}
       />
       <div className="option-list">
         {options.map((option) => {
@@ -1616,14 +1686,14 @@ function AssociateScreen({
               aria-pressed={isSelected}
             >
               <Users />
-              <span>{option}</span>
+              <span>{t(option)}</span>
               <SelectionMark selected={isSelected} />
             </button>
           );
         })}
       </div>
       <button className="primary-action bottom-action" disabled={!associateHelp} onClick={onComplete}>
-        Submit Feedback
+        {t("Submit Feedback")}
       </button>
     </div>
   );
@@ -1640,16 +1710,18 @@ function FeedbackConfirmScreen({
   reason: string;
   associateHelp: string;
 }) {
+  const { t } = useV2Language();
+
   return (
     <div className="confirm-screen">
       <BadgeCheck size={120} />
-      <h2>Thank You</h2>
-      <p>Your feedback helps the Jets improve merchandise availability and the gameday store experience.</p>
+      <h2>{t("Thank You")}</h2>
+      <p>{t("Your feedback helps the Jets improve merchandise availability and the gameday store experience.")}</p>
       <div className="confirm-card">
-        <Row label="Missing item" value={product?.name ?? "Not provided"} />
-        <Row label="Requested size" value={size} />
-        <Row label="Experience issue" value={reason} />
-        <Row label="Associate response" value={associateHelp} />
+        <Row label={t("Missing item")} value={product?.name ?? t("Not provided")} />
+        <Row label={t("Requested size")} value={size} />
+        <Row label={t("Experience issue")} value={reason ? t(reason) : ""} />
+        <Row label={t("Associate response")} value={associateHelp ? t(associateHelp) : ""} />
       </div>
     </div>
   );
