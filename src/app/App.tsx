@@ -1001,12 +1001,17 @@ function BasketScreen({
           cart.map((line, index) => (
             <div key={`${line.product.id}-${line.size}-${index}`} className="basket-line">
               <img src={line.product.image} alt={line.product.name} />
-              <div>
+              <div className="basket-line-copy">
                 <strong>{line.product.name}</strong>
                 <span>
                   Size {line.size} · Qty {line.quantity} · {fulfillmentLabel(activeFlow)}
                 </span>
                 <small>Ready for checkout</small>
+              </div>
+              <div className="basket-line-price">
+                <span>Each</span>
+                <strong>{formatPrice(line.product.price)}</strong>
+                {line.quantity > 1 && <small>{formatPrice(line.product.price * line.quantity)} item total</small>}
               </div>
               <button onClick={() => onRemove(index)}>Remove</button>
             </div>

@@ -1172,7 +1172,7 @@ button {
 
 .basket-line {
   display: grid;
-  grid-template-columns: 126px 1fr 116px;
+  grid-template-columns: 126px minmax(0, 1fr) 158px 116px;
   align-items: center;
   gap: 18px;
   min-height: 150px;
@@ -1190,6 +1190,10 @@ button {
   background: #ffffff;
 }
 
+.basket-line-copy {
+  min-width: 0;
+}
+
 .basket-line strong {
   display: block;
   color: #06130e;
@@ -1204,6 +1208,33 @@ button {
   color: rgba(6, 19, 14, 0.7);
   font-size: 20px;
   font-weight: 800;
+}
+
+.basket-line-price {
+  padding: 0 4px;
+  text-align: right;
+}
+
+.basket-line-price span {
+  margin: 0 0 4px;
+  color: rgba(6, 19, 14, 0.58);
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.basket-line-price strong {
+  color: #125740;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.basket-line-price small {
+  margin-top: 7px;
+  color: rgba(6, 19, 14, 0.66);
+  font-size: 15px;
+  line-height: 1.1;
 }
 
 .basket-line button {
