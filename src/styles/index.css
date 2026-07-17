@@ -2117,33 +2117,6 @@ button {
   -webkit-line-clamp: 3;
 }
 
-.category-screen .category-card,
-.products-screen .product-card,
-.products-screen .search-bar,
-.detail-image,
-.detail-panel {
-  background: rgba(255, 255, 255, 0.9);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-}
-
-.departments-screen .department-card {
-  background: linear-gradient(110deg, rgba(255, 255, 255, 0.91), rgba(229, 241, 234, 0.86));
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-}
-
-.category-screen .category-card img,
-.departments-screen .department-card > img,
-.products-screen .product-card img,
-.detail-image {
-  opacity: 0.95;
-}
-
-.departments-screen .department-card > img {
-  background: rgba(255, 255, 255, 0.76);
-}
-
 .product-badge {
   position: absolute;
   z-index: 2;
