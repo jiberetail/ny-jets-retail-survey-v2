@@ -694,12 +694,18 @@ function CategoryScreen({
   onAllDepartments: () => void;
 }) {
   const featured = Object.fromEntries(
-    categories.map((category) => [
-      category.id,
-      products.find((product) => product.categories.includes(category.id) && product.categories.length === 1)?.image ??
-        products.find((product) => product.categories.includes(category.id))?.image ??
-        products[0].image,
-    ]),
+    categories.map((category) => {
+      const featuredProduct = category.id === "jerseys"
+        ? products.find((product) => product.id === "p-200422502")
+        : products.find((product) => product.categories.includes(category.id) && product.categories.length === 1);
+
+      return [
+        category.id,
+        featuredProduct?.image ??
+          products.find((product) => product.categories.includes(category.id))?.image ??
+          products[0].image,
+      ];
+    }),
   ) as Record<ProductCategory, string>;
 
   return (
