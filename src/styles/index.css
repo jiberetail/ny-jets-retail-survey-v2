@@ -1480,28 +1480,31 @@ button {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: 0.92fr 1.08fr;
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(0, 1fr) auto;
   gap: 18px;
 }
 
 .checkout-qr-card,
 .checkout-instructions {
-  min-height: 690px;
+  min-height: 0;
   border-radius: 8px;
   box-shadow: 0 18px 44px rgba(0, 0, 0, 0.3);
 }
 
 .checkout-qr-card {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 430px minmax(0, 1fr);
+  grid-template-rows: auto auto auto;
+  align-content: center;
   align-items: center;
-  justify-content: center;
-  gap: 18px;
-  padding: 30px;
+  column-gap: 44px;
+  row-gap: 16px;
+  padding: 30px 44px;
   border: 2px solid rgba(255, 255, 255, 0.9);
   background: #ffffff;
   color: #06130e;
-  text-align: center;
+  text-align: left;
 }
 
 .checkout-qr-mark,
@@ -1515,10 +1518,16 @@ button {
 }
 
 .checkout-qr-mark {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: end;
   color: #125740;
 }
 
 .checkout-qr-shell {
+  grid-column: 1;
+  grid-row: 1 / 4;
+  justify-self: center;
   padding: 18px;
   border: 2px solid rgba(18, 87, 64, 0.18);
   border-radius: 8px;
@@ -1531,30 +1540,40 @@ button {
 }
 
 .checkout-qr-card > strong {
+  grid-column: 2;
+  grid-row: 2;
   color: #06130e;
-  font-size: 30px;
+  font-size: 44px;
   line-height: 1.05;
   font-weight: 950;
 }
 
 .checkout-qr-card > span {
+  grid-column: 2;
+  grid-row: 3;
+  align-self: start;
   color: rgba(6, 19, 14, 0.62);
-  font-size: 20px;
+  font-size: 23px;
   font-weight: 850;
 }
 
 .checkout-instructions {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 22px;
-  padding: 34px;
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  grid-template-rows: auto auto auto;
+  align-content: center;
+  align-items: center;
+  column-gap: 22px;
+  row-gap: 12px;
+  padding: 28px 34px;
   border: 2px solid rgba(183, 241, 210, 0.42);
   background: linear-gradient(145deg, rgba(3, 15, 10, 0.97), rgba(18, 87, 64, 0.97) 70%, rgba(34, 149, 92, 0.94));
   color: #ffffff;
 }
 
 .checkout-secure-label {
+  grid-column: 1 / -1;
+  grid-row: 1;
   width: fit-content;
   padding: 10px 14px;
   border: 1px solid rgba(183, 241, 210, 0.52);
@@ -1564,30 +1583,52 @@ button {
 }
 
 .checkout-instructions > svg {
+  grid-column: 1;
+  grid-row: 2;
   color: #ffffff;
   filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.34));
 }
 
 .checkout-instructions h3 {
+  grid-column: 2;
+  grid-row: 2;
   margin: 0;
   color: #ffffff;
-  font-size: 43px;
+  font-size: 44px;
   line-height: 1.04;
   font-weight: 950;
 }
 
 .checkout-steps {
+  grid-column: 1 / -1;
+  grid-row: 3;
   display: grid;
-  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  align-self: stretch;
+  margin-top: 6px;
 }
 
 .checkout-step {
   display: grid;
-  grid-template-columns: 46px minmax(0, 1fr);
-  align-items: center;
-  gap: 14px;
-  padding-top: 14px;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-content: start;
+  align-items: start;
+  gap: 12px;
+  padding: 16px 22px 0;
   border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.checkout-step:first-child {
+  padding-left: 0;
+}
+
+.checkout-step:last-child {
+  padding-right: 0;
+}
+
+.checkout-step + .checkout-step {
+  border-left: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .checkout-step > span {
@@ -1609,7 +1650,7 @@ button {
 
 .checkout-step strong {
   color: #ffffff;
-  font-size: 25px;
+  font-size: 23px;
   line-height: 1.05;
   font-weight: 950;
 }
@@ -1617,16 +1658,18 @@ button {
 .checkout-step small {
   margin-top: 5px;
   color: rgba(255, 255, 255, 0.72);
-  font-size: 18px;
+  font-size: 17px;
   line-height: 1.18;
   font-weight: 750;
 }
 
 .checkout-order-strip {
+  min-height: 180px;
   display: grid;
   grid-template-columns: 0.72fr 0.82fr 1.5fr 0.96fr;
+  align-items: center;
   gap: 0;
-  padding: 20px 24px;
+  padding: 28px 24px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.95);
   color: #06130e;
@@ -1648,9 +1691,9 @@ button {
 }
 
 .checkout-order-strip span {
-  margin-bottom: 7px;
+  margin-bottom: 10px;
   color: rgba(6, 19, 14, 0.58);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -1658,7 +1701,7 @@ button {
 .checkout-order-strip strong {
   overflow-wrap: anywhere;
   color: #06130e;
-  font-size: 22px;
+  font-size: 26px;
   line-height: 1.12;
   font-weight: 950;
 }
