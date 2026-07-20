@@ -8,7 +8,6 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
-  CreditCard,
   Grid3X3,
   Home,
   Languages,
@@ -16,6 +15,7 @@ import {
   PackageCheck,
   QrCode,
   Search,
+  ShieldCheck,
   ShoppingBag,
   ShoppingCart,
   Smartphone,
@@ -35,6 +35,7 @@ const STAGE_WIDTH = 1080;
 const STAGE_HEIGHT = 1920;
 const jetsGreen = "#125740";
 const ticketUrl = "https://www.newyorkjets.com/tickets/season-tickets/";
+const jetsShopCartUrl = "https://www.jetsshop.com/cart";
 
 type Flow = "concierge" | "suite" | "tickets" | "feedback" | "ship";
 type MerchFlow = Extract<Flow, "concierge" | "suite" | "ship">;
@@ -46,12 +47,8 @@ type Screen =
   | "detail"
   | "basket"
   | "fulfillment"
-  | "mobile"
-  | "payment"
-  | "confirmation"
+  | "checkout"
   | "inventory-error"
-  | "payment-error"
-  | "assist-code"
   | "ticket-start"
   | "ticket-lead"
   | "ticket-qr"
@@ -140,7 +137,7 @@ const flowCards: FlowCard[] = [
     flow: "suite",
     eyebrow: "Premium service",
     title: "Suite Delivery",
-    description: "Send paid merchandise directly to your suite during the game.",
+    description: "Send merchandise directly to your suite during the game.",
     action: "Deliver to Suite",
     Icon: Bell,
   },
@@ -215,8 +212,6 @@ export default function App() {
   const [quantity, setQuantity] = useState(1);
   const [cart, setCart] = useState<CartLine[]>([]);
   const [selectedLocation, setSelectedLocation] = useState("");
-  const [mobileNumber, setMobileNumber] = useState("");
-  const [textConsent, setTextConsent] = useState(false);
   const [ticketContactMethod, setTicketContactMethod] = useState("");
   const [lostProduct, setLostProduct] = useState<Product | null>(null);
   const [lostSize, setLostSize] = useState("");
@@ -258,8 +253,6 @@ export default function App() {
     setSelectedSize("");
     setQuantity(1);
     setSelectedLocation("");
-    setMobileNumber("");
-    setTextConsent(false);
     setTicketContactMethod("");
     setLostProduct(null);
     setLostSize("");
@@ -283,8 +276,6 @@ export default function App() {
     setQuantity(1);
     setSelectedSize("");
     setSelectedLocation("");
-    setMobileNumber("");
-    setTextConsent(false);
     setTicketContactMethod("");
     setLostProduct(null);
     setLostSize("");
@@ -315,12 +306,8 @@ export default function App() {
     else if (screen === "detail") setScreen("products");
     else if (screen === "basket") setScreen("products");
     else if (screen === "fulfillment") setScreen("basket");
-    else if (screen === "mobile") setScreen("fulfillment");
-    else if (screen === "payment") setScreen("mobile");
+    else if (screen === "checkout") setScreen("fulfillment");
     else if (screen === "inventory-error") setScreen("detail");
-    else if (screen === "payment-error") setScreen("payment");
-    else if (screen === "assist-code") setScreen("payment-error");
-    else if (screen === "confirmation") setScreen("payment");
     else if (screen === "ticket-lead" || screen === "ticket-qr") setScreen("ticket-start");
     else if (screen === "ticket-confirm") setScreen("ticket-lead");
     else if (screen === "lost-demand") setScreen("feedback-start");
@@ -428,27 +415,18 @@ export default function App() {
             activeFlow={merchFlow}
             selectedLocation={selectedLocation}
             onSelectLocation={setSelectedLocation}
-            onNext={() => setScreen("mobile")}
+            onNext={() => setScreen("checkout")}
           />
         );
-      case "mobile":
+      case "checkout":
         return (
-          <MobileConsentScreen
+          <CheckoutHandoffScreen
             activeFlow={merchFlow}
-            mobileNumber={mobileNumber}
-            textConsent={textConsent}
-            onNumberChange={setMobileNumber}
-            onConsentChange={setTextConsent}
-            onNext={() => setScreen("payment")}
-          />
-        );
-      case "payment":
-        return (
-          <PaymentScreen
-            activeFlow={merchFlow}
+            cart={cart}
             total={total}
             orderId={orderId}
-            onComplete={() => setScreen("confirmation")}
+            selectedLocation={selectedLocation}
+            onClose={goHome}
           />
         );
       case "inventory-error":
@@ -457,21 +435,6 @@ export default function App() {
             product={selectedProduct}
             onChooseAlternative={(product) => selectProduct(product)}
             onBackToBasket={() => setScreen(cart.length ? "basket" : "products")}
-          />
-        );
-      case "payment-error":
-        return <PaymentErrorScreen onRetry={() => setScreen("payment")} onAssist={() => setScreen("assist-code")} />;
-      case "assist-code":
-        return <AssistCodeScreen orderId={orderId} onDone={() => setScreen("confirmation")} />;
-      case "confirmation":
-        return (
-          <ConfirmationScreen
-            activeFlow={merchFlow}
-            orderId={orderId}
-            selectedLocation={selectedLocation}
-            mobileNumber={mobileNumber}
-            total={total}
-            onClose={goHome}
           />
         );
       case "ticket-start":
@@ -1030,7 +993,7 @@ function BasketScreen({
       <ScreenHeader
         kicker={t("Review order")}
         title={t("Your Basket")}
-        copy={t("Review your items and fulfillment details before payment.")}
+        copy={t("Review your items and fulfillment details before online checkout.")}
       />
       <div className="basket-list">
         {cart.length === 0 ? (
@@ -1070,7 +1033,7 @@ function BasketScreen({
         <Row label={t("Subtotal")} value={formatPrice(subtotal)} />
         <Row label={t("Shipping / delivery")} value={deliveryFee ? formatPrice(deliveryFee) : t("Included")} />
         <Row label={t("Estimated tax")} value={formatPrice(subtotal * 0.06625)} />
-        <Row label={t("Total due at kiosk")} value={formatPrice(total)} strong />
+        <Row label={t("Estimated order total")} value={formatPrice(total)} strong />
       </div>
       <div className="dual-actions">
         <button className="secondary-action add-more-action" onClick={onContinueShopping}>
@@ -1100,7 +1063,7 @@ function FulfillmentScreen({
     activeFlow === "suite"
       ? suiteLocations
       : activeFlow === "ship"
-        ? ["Use saved address", "Enter address on kiosk", "Secure phone address entry"]
+        ? ["Enter shipping details on your phone"]
         : pickupLocations;
 
   return (
@@ -1116,7 +1079,7 @@ function FulfillmentScreen({
         }
         copy={
           activeFlow === "ship"
-            ? t("Choose how you would like to provide a secure shipping address.")
+            ? t("Your address and delivery options will be completed securely on your phone.")
             : t("Choose the most convenient location for your order.")
         }
       />
@@ -1143,7 +1106,7 @@ function FulfillmentScreen({
           <Truck />
           <div>
             <strong>{t("Estimated delivery: 3-5 business days")}</strong>
-            <span>{t("Shipping cost and delivery window are displayed before payment.")}</span>
+            <span>{t("Shipping cost and delivery timing are confirmed during online checkout.")}</span>
           </div>
         </div>
       )}
@@ -1154,157 +1117,117 @@ function FulfillmentScreen({
   );
 }
 
-function MobileConsentScreen({
+function CheckoutHandoffScreen({
   activeFlow,
-  mobileNumber,
-  textConsent,
-  onNumberChange,
-  onConsentChange,
-  onNext,
-}: {
-  activeFlow: MerchFlow | null;
-  mobileNumber: string;
-  textConsent: boolean;
-  onNumberChange: (value: string) => void;
-  onConsentChange: (value: boolean) => void;
-  onNext: () => void;
-}) {
-  const { t } = useV2Language();
-
-  return (
-    <div className="content-stack">
-      <ScreenHeader
-        kicker={t("Notifications")}
-        title={t("Where Should We Text Updates?")}
-        copy={
-          activeFlow === "ship"
-            ? t("We will send your receipt now and tracking details when your order ships.")
-            : t("We will text you as soon as your order is ready.")
-        }
-      />
-      <div className="phone-panel">
-        <Smartphone size={72} />
-        <label>
-          {t("Mobile number")}
-          <input
-            type="tel"
-            value={mobileNumber}
-            onChange={(event) => onNumberChange(event.target.value)}
-            placeholder="(201) 555-0123"
-          />
-        </label>
-      </div>
-      <button
-        className={textConsent ? "consent-card selected" : "consent-card"}
-        onClick={() => onConsentChange(!textConsent)}
-        aria-pressed={textConsent}
-      >
-        <SelectionMark selected={textConsent} />
-        <span>
-          {t("I agree to receive order updates by text message from New York Jets game day retail. Message and data rates may apply.")}
-        </span>
-      </button>
-      <button className="primary-action bottom-action" disabled={!textConsent || !mobileNumber.trim()} onClick={onNext}>
-        {t("Continue to Payment")}
-      </button>
-    </div>
-  );
-}
-
-function PaymentScreen({
-  activeFlow,
+  cart,
   total,
-  orderId,
-  onComplete,
-}: {
-  activeFlow: MerchFlow | null;
-  total: number;
-  orderId: string;
-  onComplete: () => void;
-}) {
-  const { t } = useV2Language();
-  const receiptUrl = `${window.location.origin}${window.location.pathname}?order=${orderId}`;
-
-  return (
-    <div className="content-stack">
-      <ScreenHeader
-        kicker={t("Kiosk payment")}
-        title={t("Tap or Insert Card")}
-        copy={t("Use the payment terminal below to securely complete your order.")}
-      />
-      <div className="payment-card">
-        <CreditCard size={96} />
-        <strong>{formatPrice(total)}</strong>
-        <span>{t("{fulfillment} · Order {orderId}", { fulfillment: fulfillmentLabel(activeFlow, t), orderId })}</span>
-      </div>
-      <div className="qr-status">
-        <QRCodeSVG value={receiptUrl} size={170} bgColor="#ffffff" fgColor={jetsGreen} />
-        <div>
-          <strong>{t("Receipt and order status")}</strong>
-          <span>{t("Scan after payment to keep your order details.")}</span>
-        </div>
-      </div>
-      <button className="primary-action" onClick={onComplete}>
-        {t("Pay {total}", { total: formatPrice(total) })}
-      </button>
-    </div>
-  );
-}
-
-function ConfirmationScreen({
-  activeFlow,
   orderId,
   selectedLocation,
-  mobileNumber,
-  total,
   onClose,
 }: {
   activeFlow: MerchFlow | null;
+  cart: CartLine[];
+  total: number;
   orderId: string;
   selectedLocation: string;
-  mobileNumber: string;
-  total: number;
   onClose: () => void;
 }) {
   const { t } = useV2Language();
-  const [secondsRemaining, setSecondsRemaining] = useState(10);
-
-  useEffect(() => {
-    const startedAt = Date.now();
-    const countdown = window.setInterval(() => {
-      const elapsedSeconds = Math.floor((Date.now() - startedAt) / 1000);
-      setSecondsRemaining(Math.max(0, 10 - elapsedSeconds));
-    }, 250);
-    const reset = window.setTimeout(onClose, 10_000);
-
-    return () => {
-      window.clearInterval(countdown);
-      window.clearTimeout(reset);
-    };
-  }, [onClose]);
-
-  const message =
-    activeFlow === "suite"
-      ? t("Your order is paid and will be delivered to {location} by stadium personnel.", { location: t(selectedLocation) })
-      : activeFlow === "ship"
-        ? t("Your order is confirmed and will be packed for shipment.")
-        : t("Your order is being prepared and will be available at the {location}.", { location: t(selectedLocation) });
+  const itemCount = cart.reduce((count, line) => count + line.quantity, 0);
+  const itemCountLabel = itemCount === 1 ? t("1 item") : t("{count} items", { count: itemCount });
+  const checkoutUrl = new URL(jetsShopCartUrl);
+  checkoutUrl.searchParams.set("utm_source", "metlife_stadium_kiosk");
+  checkoutUrl.searchParams.set("utm_medium", "qr");
+  checkoutUrl.searchParams.set("utm_campaign", "jets_game_day_checkout");
+  checkoutUrl.searchParams.set("utm_content", activeFlow ?? "retail");
+  checkoutUrl.searchParams.set("kiosk_ref", orderId);
+  const fulfillment = activeFlow === "ship"
+    ? t("Shipping details entered on your phone")
+    : t(selectedLocation);
 
   return (
-    <div className="confirm-screen">
-      <BadgeCheck size={120} />
-      <h2>{t("Order Confirmed")}</h2>
-      <p>{message}</p>
-      <div className="confirm-card">
-        <Row label={t("Order number")} value={orderId} strong />
-        <Row label={t("Total paid")} value={formatPrice(total)} />
-        <Row label={t("Text updates")} value={mobileNumber} />
-        <Row label={t("Estimated ready time")} value={activeFlow === "ship" ? t("Tracking sent when packed") : t("18-22 minutes")} />
+    <div className="content-stack checkout-screen">
+      <ScreenHeader
+        kicker={t("Secure online checkout")}
+        title={t("Scan to Complete Your Purchase")}
+        copy={t("Continue on Jets Shop to review your cart and pay securely from your phone.")}
+      />
+      <div className="checkout-layout">
+        <section className="checkout-qr-card" aria-label={t("Jets Shop checkout QR code")}>
+          <div className="checkout-qr-mark">
+            <QrCode />
+            <span>{t("Official Jets Shop")}</span>
+          </div>
+          <div className="checkout-qr-shell">
+            <QRCodeSVG
+              value={checkoutUrl.toString()}
+              size={352}
+              level="M"
+              bgColor="#ffffff"
+              fgColor={jetsGreen}
+            />
+          </div>
+          <strong>{t("Scan with your phone camera")}</strong>
+          <span>{t("Opens jetsshop.com/cart")}</span>
+        </section>
+        <section className="checkout-instructions">
+          <div className="checkout-secure-label">
+            <ShieldCheck />
+            <span>{t("Checkout stays on your phone")}</span>
+          </div>
+          <Smartphone size={82} />
+          <h3>{t("Finish in three quick steps")}</h3>
+          <div className="checkout-steps">
+            <div className="checkout-step">
+              <span>1</span>
+              <div>
+                <strong>{t("Scan the QR code")}</strong>
+                <small>{t("Open it with your phone camera.")}</small>
+              </div>
+            </div>
+            <div className="checkout-step">
+              <span>2</span>
+              <div>
+                <strong>{t("Review your Jets Shop cart")}</strong>
+                <small>{t("Confirm products, sizes, and fulfillment.")}</small>
+              </div>
+            </div>
+            <div className="checkout-step">
+              <span>3</span>
+              <div>
+                <strong>{t("Pay securely on your phone")}</strong>
+                <small>{t("Jets Shop handles all payment details.")}</small>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
-      <div className="confirmation-exit">
-        <span>{t("Returning to the start in {seconds} seconds", { seconds: secondsRemaining })}</span>
-        <button className="primary-action" onClick={onClose}>{t("Close")}</button>
+      <div className="checkout-order-strip">
+        <div>
+          <span>{t("Kiosk selection")}</span>
+          <strong>{itemCountLabel}</strong>
+        </div>
+        <div>
+          <span>{t("Estimated total")}</span>
+          <strong>{formatPrice(total)}</strong>
+        </div>
+        <div>
+          <span>{t("Fulfillment")}</span>
+          <strong>{fulfillment}</strong>
+        </div>
+        <div>
+          <span>{t("Reference")}</span>
+          <strong>{orderId}</strong>
+        </div>
       </div>
+      <div className="checkout-trust-strip">
+        <ShieldCheck />
+        <span>{t("Prices, availability, taxes, and fulfillment are confirmed on Jets Shop before purchase.")}</span>
+      </div>
+      <button className="primary-action checkout-done-action" onClick={onClose}>
+        <Check />
+        {t("Done - Clear Kiosk")}
+      </button>
     </div>
   );
 }
@@ -1332,7 +1255,7 @@ function InventoryErrorScreen({
       <ScreenHeader
         kicker={t("Inventory issue")}
         title={t("Size Unavailable")}
-        copy={t("{product} is unavailable in one requested size. The kiosk blocks checkout and offers alternatives before payment.", { product: product.name })}
+        copy={t("{product} is unavailable in one requested size. The kiosk blocks checkout and offers alternatives before online checkout.", { product: product.name })}
       />
       <div className="alert-panel">
         <AlertTriangle size={72} />
@@ -1352,54 +1275,6 @@ function InventoryErrorScreen({
       </div>
       <button className="secondary-action bottom-action" onClick={onBackToBasket}>
         {t("Back to Basket")}
-      </button>
-    </div>
-  );
-}
-
-function PaymentErrorScreen({ onRetry, onAssist }: { onRetry: () => void; onAssist: () => void }) {
-  const { t } = useV2Language();
-
-  return (
-    <div className="content-stack">
-      <ScreenHeader
-        kicker={t("Payment issue")}
-        title={t("Payment Not Approved")}
-        copy={t("The order is preserved for a quick retry. Assisted checkout is available as a fallback.")}
-      />
-      <div className="alert-panel">
-        <CreditCard size={72} />
-        <div>
-          <strong>{t("Card reader declined the transaction")}</strong>
-          <span>{t("No payment was captured. Inventory hold remains active for 6 minutes.")}</span>
-        </div>
-      </div>
-      <button className="primary-action" onClick={onRetry}>
-        {t("Try Payment Again")}
-      </button>
-      <button className="secondary-action" onClick={onAssist}>
-        {t("Generate Assisted Checkout Code")}
-      </button>
-    </div>
-  );
-}
-
-function AssistCodeScreen({ orderId, onDone }: { orderId: string; onDone: () => void }) {
-  const { t } = useV2Language();
-
-  return (
-    <div className="content-stack">
-      <ScreenHeader
-        kicker={t("Need help?")}
-        title={t("Assisted Checkout Code")}
-        copy={t("The fan presents this code at a concierge or merchandise desk. An associate accepts payment and submits the order.")}
-      />
-      <div className="code-card">
-        <span>{orderId.replace("JETS", "DN")}</span>
-        <QRCodeSVG value={`assisted-checkout:${orderId}`} size={230} bgColor="#ffffff" fgColor={jetsGreen} />
-      </div>
-      <button className="primary-action bottom-action" onClick={onDone}>
-        {t("Complete Order")}
       </button>
     </div>
   );

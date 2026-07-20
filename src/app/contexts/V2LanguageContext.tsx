@@ -47,8 +47,8 @@ const spanish: Record<string, string> = {
     "Compra artículos de los Jets y recógelos en un mostrador de mercancía cercano.",
   "Start Pickup Order": "Iniciar pedido",
   "Premium service": "Servicio premium",
-  "Send paid merchandise directly to your suite during the game.":
-    "Recibe la mercancía pagada directamente en tu suite durante el partido.",
+  "Send merchandise directly to your suite during the game.":
+    "Recibe la mercancía directamente en tu suite durante el partido.",
   "Deliver to Suite": "Entregar en la suite",
   "Home delivery": "Entrega a domicilio",
   "Ship to Home": "Enviar a Casa",
@@ -136,11 +136,12 @@ const spanish: Record<string, string> = {
 
   "Review order": "Revisar pedido",
   "Your Basket": "Tu Carrito",
-  "Review your items and fulfillment details before payment.": "Revisa tus artículos y los detalles de entrega antes de pagar.",
+  "Review your items and fulfillment details before online checkout.":
+    "Revisa tus artículos y los detalles de entrega antes de continuar al pago en línea.",
   "No items yet": "Aún no hay artículos",
   "Add merchandise to build this order.": "Agrega mercancía para crear este pedido.",
   "Size {size} · Qty {quantity} · {fulfillment}": "Talla {size} · Cant. {quantity} · {fulfillment}",
-  "Ready for checkout": "Listo para pagar",
+  "Ready for checkout": "Listo para finalizar la compra",
   Each: "Cada uno",
   "{price} item total": "{price} total del artículo",
   Remove: "Eliminar",
@@ -148,81 +149,57 @@ const spanish: Record<string, string> = {
   "Shipping / delivery": "Envío / entrega",
   Included: "Incluido",
   "Estimated tax": "Impuesto estimado",
-  "Total due at kiosk": "Total a pagar en el quiosco",
+  "Estimated order total": "Total estimado del pedido",
   "Add More": "Agregar Más",
 
   Fulfillment: "Entrega",
   "Confirm Suite Delivery": "Confirmar Entrega a la Suite",
   "Choose Shipping Details": "Elegir Detalles de Envío",
   "Choose Pickup Location": "Elegir Lugar de Recogida",
-  "Choose how you would like to provide a secure shipping address.":
-    "Elige cómo deseas proporcionar una dirección de envío segura.",
+  "Your address and delivery options will be completed securely on your phone.":
+    "Completarás tu dirección y las opciones de entrega de forma segura en tu teléfono.",
   "Choose the most convenient location for your order.": "Elige el lugar más conveniente para tu pedido.",
-  "Use saved address": "Usar dirección guardada",
-  "Enter address on kiosk": "Ingresar dirección en el quiosco",
-  "Secure phone address entry": "Ingresar dirección de forma segura por teléfono",
+  "Enter shipping details on your phone": "Ingresar datos de envío en tu teléfono",
   "Club-Level Concierge Desk": "Mostrador Concierge del Nivel Club",
   "MetLife Gate Shop Pickup": "Recogida en la Tienda de la Puerta MetLife",
   "Mezzanine Merchandise Window": "Ventanilla de Mercancía del Mezzanine",
   "Estimated delivery: 3-5 business days": "Entrega estimada: 3 a 5 días hábiles",
-  "Shipping cost and delivery window are displayed before payment.":
-    "El costo y el plazo de envío se muestran antes del pago.",
+  "Shipping cost and delivery timing are confirmed during online checkout.":
+    "El costo y el plazo de entrega se confirman durante el pago en línea.",
 
-  Notifications: "Notificaciones",
-  "Where Should We Text Updates?": "¿Dónde Enviamos las Actualizaciones?",
-  "We will send your receipt now and tracking details when your order ships.":
-    "Enviaremos tu recibo ahora y el seguimiento cuando se envíe tu pedido.",
-  "We will text you as soon as your order is ready.": "Te enviaremos un mensaje cuando tu pedido esté listo.",
   "Mobile number": "Número de móvil",
-  "I agree to receive order updates by text message from New York Jets game day retail. Message and data rates may apply.":
-    "Acepto recibir por mensaje de texto actualizaciones del pedido de New York Jets game day retail. Pueden aplicarse tarifas de mensajes y datos.",
-  "Continue to Payment": "Continuar al Pago",
-
-  "Kiosk payment": "Pago en el quiosco",
-  "Tap or Insert Card": "Acerque o Inserte la Tarjeta",
-  "Use the payment terminal below to securely complete your order.":
-    "Usa la terminal de pago para completar tu pedido de forma segura.",
-  "{fulfillment} · Order {orderId}": "{fulfillment} · Pedido {orderId}",
-  "Receipt and order status": "Recibo y estado del pedido",
-  "Scan after payment to keep your order details.": "Escanea después del pago para guardar los detalles de tu pedido.",
-  "Pay {total}": "Pagar {total}",
-
-  "Your order is paid and will be delivered to {location} by stadium personnel.":
-    "Tu pedido está pagado y el personal del estadio lo entregará en {location}.",
-  "Your order is confirmed and will be packed for shipment.": "Tu pedido está confirmado y se preparará para el envío.",
-  "Your order is being prepared and will be available at the {location}.":
-    "Tu pedido se está preparando y estará disponible en {location}.",
-  "Order Confirmed": "Pedido Confirmado",
-  "Order number": "Número de pedido",
-  "Total paid": "Total pagado",
-  "Text updates": "Actualizaciones por texto",
-  "Estimated ready time": "Tiempo estimado",
-  "Tracking sent when packed": "Seguimiento enviado al empacar",
-  "18-22 minutes": "18 a 22 minutos",
-  "Returning to the start in {seconds} seconds": "Regreso al inicio en {seconds} segundos",
+  "Secure online checkout": "Pago seguro en línea",
+  "Scan to Complete Your Purchase": "Escanea para Completar tu Compra",
+  "Continue on Jets Shop to review your cart and pay securely from your phone.":
+    "Continúa en Jets Shop para revisar tu carrito y pagar de forma segura desde tu teléfono.",
+  "Jets Shop checkout QR code": "Código QR para finalizar la compra en Jets Shop",
+  "Official Jets Shop": "Tienda Oficial Jets Shop",
+  "Scan with your phone camera": "Escanea con la cámara de tu teléfono",
+  "Opens jetsshop.com/cart": "Abre jetsshop.com/cart",
+  "Checkout stays on your phone": "La compra se completa en tu teléfono",
+  "Finish in three quick steps": "Termina en tres pasos rápidos",
+  "Scan the QR code": "Escanea el código QR",
+  "Open it with your phone camera.": "Ábrelo con la cámara de tu teléfono.",
+  "Review your Jets Shop cart": "Revisa tu carrito de Jets Shop",
+  "Confirm products, sizes, and fulfillment.": "Confirma productos, tallas y entrega.",
+  "Pay securely on your phone": "Paga de forma segura en tu teléfono",
+  "Jets Shop handles all payment details.": "Jets Shop gestiona todos los datos de pago.",
+  "Kiosk selection": "Selección del quiosco",
+  "1 item": "1 artículo",
+  "Estimated total": "Total estimado",
+  Reference: "Referencia",
+  "Shipping details entered on your phone": "Datos de envío ingresados en tu teléfono",
+  "Prices, availability, taxes, and fulfillment are confirmed on Jets Shop before purchase.":
+    "Los precios, la disponibilidad, los impuestos y la entrega se confirman en Jets Shop antes de comprar.",
+  "Done - Clear Kiosk": "Listo - Limpiar Quiosco",
 
   "Inventory issue": "Problema de inventario",
   "Size Unavailable": "Talla No Disponible",
-  "{product} is unavailable in one requested size. The kiosk blocks checkout and offers alternatives before payment.":
-    "{product} no está disponible en una talla solicitada. El quiosco bloquea el pago y ofrece alternativas.",
+  "{product} is unavailable in one requested size. The kiosk blocks checkout and offers alternatives before online checkout.":
+    "{product} no está disponible en una talla solicitada. El quiosco bloquea la compra y ofrece alternativas antes del pago en línea.",
   "Unable to reserve selected item": "No se pudo reservar el artículo seleccionado",
   "Size M now shows 0 available at this location.": "La talla M ahora muestra 0 disponibles en este lugar.",
   "Back to Basket": "Volver al Carrito",
-
-  "Payment issue": "Problema de pago",
-  "Payment Not Approved": "Pago No Aprobado",
-  "The order is preserved for a quick retry. Assisted checkout is available as a fallback.":
-    "El pedido se conserva para volver a intentarlo. También hay pago asistido disponible.",
-  "Card reader declined the transaction": "El lector de tarjetas rechazó la transacción",
-  "No payment was captured. Inventory hold remains active for 6 minutes.":
-    "No se realizó ningún cobro. La reserva de inventario permanece activa durante 6 minutos.",
-  "Try Payment Again": "Intentar el Pago de Nuevo",
-  "Generate Assisted Checkout Code": "Generar Código de Pago Asistido",
-  "Need help?": "¿Necesitas ayuda?",
-  "Assisted Checkout Code": "Código de Pago Asistido",
-  "The fan presents this code at a concierge or merchandise desk. An associate accepts payment and submits the order.":
-    "Presenta este código en un mostrador concierge o de mercancía. Un asociado recibirá el pago y enviará el pedido.",
-  "Complete Order": "Completar Pedido",
 
   "Jets official ticketing": "Boletos oficiales de los Jets",
   "Interested in Becoming a Season-Ticket Holder?": "¿Te Interesa Tener Abonos de Temporada?",
