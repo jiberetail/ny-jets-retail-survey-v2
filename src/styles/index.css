@@ -1345,18 +1345,48 @@ button {
 }
 
 .add-more-action {
-  background: #4f6f86;
+  background-image:
+    linear-gradient(112deg, transparent 0%, transparent 39%, rgba(255, 255, 255, 0.42) 48%, transparent 57%, transparent 100%),
+    linear-gradient(135deg, #315f80 0%, #648aa4 100%);
+  background-position: 180% 0, 0 0;
+  background-size: 240% 100%, 100% 100%;
   color: #ffffff;
-  border-color: #9db2c1;
-  box-shadow: 0 10px 24px rgba(37, 62, 79, 0.28);
+  border-color: #b8cddb;
+  box-shadow: 0 12px 28px rgba(31, 76, 108, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  animation: add-more-shimmer 3.4s ease-in-out infinite;
+  transition: filter 180ms ease, transform 180ms ease, box-shadow 180ms ease;
 }
 
 .add-more-action:hover {
-  background: #435f74;
+  filter: brightness(1.1) saturate(1.08);
+  box-shadow: 0 16px 34px rgba(31, 76, 108, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .add-more-action:active {
-  background: #374f61;
+  transform: translateY(2px);
+  filter: brightness(0.96);
+}
+
+.add-more-action:focus-visible {
+  outline: 4px solid rgba(179, 220, 246, 0.94);
+  outline-offset: 4px;
+}
+
+@keyframes add-more-shimmer {
+  0%,
+  56% {
+    background-position: 180% 0, 0 0;
+  }
+
+  100% {
+    background-position: -85% 0, 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .add-more-action {
+    animation: none;
+  }
 }
 
 .text-action {
