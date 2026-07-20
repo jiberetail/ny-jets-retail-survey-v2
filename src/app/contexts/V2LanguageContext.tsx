@@ -154,18 +154,11 @@ const spanish: Record<string, string> = {
 
   Fulfillment: "Entrega",
   "Confirm Suite Delivery": "Confirmar Entrega a la Suite",
-  "Choose Shipping Details": "Elegir Detalles de Envío",
   "Choose Pickup Location": "Elegir Lugar de Recogida",
-  "Your address and delivery options will be completed securely on your phone.":
-    "Completarás tu dirección y las opciones de entrega de forma segura en tu teléfono.",
   "Choose the most convenient location for your order.": "Elige el lugar más conveniente para tu pedido.",
-  "Enter shipping details on your phone": "Ingresar datos de envío en tu teléfono",
   "Club-Level Concierge Desk": "Mostrador Concierge del Nivel Club",
   "MetLife Gate Shop Pickup": "Recogida en la Tienda de la Puerta MetLife",
   "Mezzanine Merchandise Window": "Ventanilla de Mercancía del Mezzanine",
-  "Estimated delivery: 3-5 business days": "Entrega estimada: 3 a 5 días hábiles",
-  "Shipping cost and delivery timing are confirmed during online checkout.":
-    "El costo y el plazo de entrega se confirman durante el pago en línea.",
 
   "Mobile number": "Número de móvil",
   "Secure online checkout": "Pago seguro en línea",

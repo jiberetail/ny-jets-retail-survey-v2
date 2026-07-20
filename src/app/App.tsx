@@ -306,7 +306,7 @@ export default function App() {
     else if (screen === "detail") setScreen("products");
     else if (screen === "basket") setScreen("products");
     else if (screen === "fulfillment") setScreen("basket");
-    else if (screen === "checkout") setScreen("fulfillment");
+    else if (screen === "checkout") setScreen(activeFlow === "ship" ? "basket" : "fulfillment");
     else if (screen === "inventory-error") setScreen("detail");
     else if (screen === "ticket-lead" || screen === "ticket-qr") setScreen("ticket-start");
     else if (screen === "ticket-confirm") setScreen("ticket-lead");
@@ -406,7 +406,7 @@ export default function App() {
             deliveryFee={deliveryFee}
             onContinueShopping={() => setScreen("category")}
             onRemove={(index) => setCart((currentCart) => currentCart.filter((_, itemIndex) => itemIndex !== index))}
-            onNext={() => setScreen("fulfillment")}
+            onNext={() => setScreen(activeFlow === "ship" ? "checkout" : "fulfillment")}
           />
         );
       case "fulfillment":
@@ -1059,12 +1059,7 @@ function FulfillmentScreen({
   onNext: () => void;
 }) {
   const { t } = useV2Language();
-  const options =
-    activeFlow === "suite"
-      ? suiteLocations
-      : activeFlow === "ship"
-        ? ["Enter shipping details on your phone"]
-        : pickupLocations;
+  const options = activeFlow === "suite" ? suiteLocations : pickupLocations;
 
   return (
     <div className="content-stack">
@@ -1073,15 +1068,9 @@ function FulfillmentScreen({
         title={
           activeFlow === "suite"
             ? t("Confirm Suite Delivery")
-            : activeFlow === "ship"
-              ? t("Choose Shipping Details")
-              : t("Choose Pickup Location")
+            : t("Choose Pickup Location")
         }
-        copy={
-          activeFlow === "ship"
-            ? t("Your address and delivery options will be completed securely on your phone.")
-            : t("Choose the most convenient location for your order.")
-        }
+        copy={t("Choose the most convenient location for your order.")}
       />
       <div className="option-list">
         {options.map((option) => {
@@ -1101,15 +1090,6 @@ function FulfillmentScreen({
           );
         })}
       </div>
-      {activeFlow === "ship" && (
-        <div className="info-panel">
-          <Truck />
-          <div>
-            <strong>{t("Estimated delivery: 3-5 business days")}</strong>
-            <span>{t("Shipping cost and delivery timing are confirmed during online checkout.")}</span>
-          </div>
-        </div>
-      )}
       <button className="primary-action bottom-action" disabled={!selectedLocation} onClick={onNext}>
         {t("Continue")}
       </button>
