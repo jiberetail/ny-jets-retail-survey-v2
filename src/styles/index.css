@@ -1937,6 +1937,181 @@ button {
   height: 30px;
 }
 
+.order-confirm-screen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 34px;
+  padding: 28px 0 10px;
+}
+
+.order-confirm-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.order-confirm-icon {
+  width: 142px;
+  height: 142px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.82);
+  border-radius: 50%;
+  background: #168f59;
+  color: #ffffff;
+  box-shadow: 0 20px 52px rgba(0, 0, 0, 0.42), 0 0 0 14px rgba(40, 209, 124, 0.16);
+}
+
+.order-confirm-icon svg {
+  width: 84px;
+  height: 84px;
+  stroke-width: 2.4;
+}
+
+.order-confirm-hero h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 72px;
+  line-height: 1.04;
+  font-weight: 950;
+  text-shadow: 0 8px 22px rgba(0, 0, 0, 0.48);
+}
+
+.order-confirm-hero > p:last-child {
+  margin: 16px 0 0;
+  color: rgba(255, 255, 255, 0.94);
+  font-size: 32px;
+  line-height: 1.2;
+  font-weight: 800;
+  text-shadow: 0 8px 22px rgba(0, 0, 0, 0.44);
+}
+
+.order-confirm-card {
+  width: 100%;
+  max-width: 900px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #06130e;
+  box-shadow: 0 24px 62px rgba(0, 0, 0, 0.4);
+}
+
+.order-confirm-reference {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 116px;
+  padding: 22px 30px;
+  background: #0c3f2e;
+  color: #ffffff;
+}
+
+.order-confirm-reference span,
+.order-confirm-grid span {
+  display: block;
+  font-size: 18px;
+  line-height: 1.15;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.order-confirm-reference span {
+  color: #b7f1d2;
+}
+
+.order-confirm-reference strong {
+  font-size: 44px;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.order-confirm-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.order-confirm-grid > div {
+  min-height: 128px;
+  padding: 24px 28px;
+  border-bottom: 1px solid rgba(6, 19, 14, 0.12);
+}
+
+.order-confirm-grid > div:nth-child(odd) {
+  border-right: 1px solid rgba(6, 19, 14, 0.12);
+}
+
+.order-confirm-grid span {
+  color: rgba(6, 19, 14, 0.58);
+}
+
+.order-confirm-grid strong {
+  display: block;
+  margin-top: 10px;
+  color: #06130e;
+  font-size: 27px;
+  line-height: 1.14;
+  font-weight: 950;
+}
+
+.order-confirm-notice {
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  align-items: center;
+  gap: 18px;
+  min-height: 126px;
+  padding: 22px 28px;
+  background: #eaf6f0;
+}
+
+.order-confirm-notice > svg {
+  width: 50px;
+  height: 50px;
+  color: #168f59;
+}
+
+.order-confirm-notice strong,
+.order-confirm-notice span {
+  display: block;
+}
+
+.order-confirm-notice strong {
+  color: #0c3f2e;
+  font-size: 27px;
+  font-weight: 950;
+}
+
+.order-confirm-notice span {
+  margin-top: 5px;
+  color: rgba(6, 19, 14, 0.72);
+  font-size: 22px;
+  line-height: 1.22;
+  font-weight: 750;
+}
+
+.order-confirm-screen .confirmation-exit {
+  margin-top: 4px;
+}
+
+.order-confirm-screen .confirmation-exit .primary-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.order-confirm-screen .confirmation-exit .primary-action svg {
+  width: 28px;
+  height: 28px;
+}
+
 .qr-status svg,
 .large-qr-card svg,
 .code-card svg {

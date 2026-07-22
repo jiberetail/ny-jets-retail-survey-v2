@@ -203,7 +203,18 @@ const spanish: Record<string, string> = {
   "Shipping details entered on your phone": "Datos de envío ingresados en tu teléfono",
   "Prices, availability, taxes, and fulfillment are confirmed on Jets Shop before purchase.":
     "Los precios, la disponibilidad, los impuestos y la entrega se confirman en Jets Shop antes de comprar.",
-  "Done - Clear Kiosk": "Listo - Limpiar Quiosco",
+  "I've Completed Checkout": "He Completado la Compra",
+  "Order received": "Pedido recibido",
+  "Order Confirmed": "Pedido Confirmado",
+  "Your order has been placed.": "Tu pedido ha sido realizado.",
+  "Order confirmation details": "Detalles de confirmación del pedido",
+  "Order reference": "Referencia del pedido",
+  "We'll text you when your order is on the way to your suite.":
+    "Te enviaremos un mensaje cuando tu pedido vaya camino a tu suite.",
+  "Shipping and delivery updates will continue on your phone.":
+    "Las actualizaciones de envío y entrega continuarán en tu teléfono.",
+  "We'll keep you updated": "Te mantendremos informado",
+  "This kiosk will reset in {count} seconds.": "Este quiosco se reiniciará en {count} segundos.",
 
   "Inventory issue": "Problema de inventario",
   "Size Unavailable": "Talla No Disponible",

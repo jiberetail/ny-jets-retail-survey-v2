@@ -57,6 +57,7 @@ type Screen =
   | "fulfillment"
   | "contact"
   | "checkout"
+  | "order-confirm"
   | "inventory-error"
   | "ticket-start"
   | "ticket-lead"
@@ -347,6 +348,7 @@ export default function App() {
     else if (screen === "fulfillment") setScreen("basket");
     else if (screen === "contact") setScreen("fulfillment");
     else if (screen === "checkout") setScreen(activeFlow === "ship" ? "basket" : "contact");
+    else if (screen === "order-confirm") setScreen("checkout");
     else if (screen === "inventory-error") setScreen("detail");
     else if (screen === "ticket-lead" || screen === "ticket-qr") setScreen("ticket-start");
     else if (screen === "ticket-confirm") setScreen("ticket-lead");
@@ -521,6 +523,17 @@ export default function App() {
       case "checkout":
         return (
           <CheckoutHandoffScreen
+            activeFlow={merchFlow}
+            cart={cart}
+            total={total}
+            orderId={orderId}
+            selectedLocation={selectedLocation}
+            onComplete={() => setScreen("order-confirm")}
+          />
+        );
+      case "order-confirm":
+        return (
+          <OrderConfirmationScreen
             activeFlow={merchFlow}
             cart={cart}
             total={total}
@@ -1307,14 +1320,14 @@ function CheckoutHandoffScreen({
   total,
   orderId,
   selectedLocation,
-  onClose,
+  onComplete,
 }: {
   activeFlow: MerchFlow | null;
   cart: CartLine[];
   total: number;
   orderId: string;
   selectedLocation: string;
-  onClose: () => void;
+  onComplete: () => void;
 }) {
   const { t } = useV2Language();
   const itemCount = cart.reduce((count, line) => count + line.quantity, 0);
@@ -1408,10 +1421,107 @@ function CheckoutHandoffScreen({
         <ShieldCheck />
         <span>{t("Prices, availability, taxes, and fulfillment are confirmed on Jets Shop before purchase.")}</span>
       </div>
-      <button className="primary-action checkout-done-action" onClick={onClose}>
+      <button className="primary-action checkout-done-action" onClick={onComplete}>
         <Check />
-        {t("Done - Clear Kiosk")}
+        {t("I've Completed Checkout")}
       </button>
+    </div>
+  );
+}
+
+function OrderConfirmationScreen({
+  activeFlow,
+  cart,
+  total,
+  orderId,
+  selectedLocation,
+  onClose,
+}: {
+  activeFlow: MerchFlow | null;
+  cart: CartLine[];
+  total: number;
+  orderId: string;
+  selectedLocation: string;
+  onClose: () => void;
+}) {
+  const { t } = useV2Language();
+  const [secondsRemaining, setSecondsRemaining] = useState(10);
+  const itemCount = cart.reduce((count, line) => count + line.quantity, 0);
+  const itemCountLabel = itemCount === 1 ? t("1 item") : t("{count} items", { count: itemCount });
+  const service = activeFlow === "suite"
+    ? t("Suite Delivery")
+    : activeFlow === "ship"
+      ? t("Ship to Home")
+      : t("Concierge Pickup");
+  const fulfillment = activeFlow === "ship" ? t("Ship to home") : t(selectedLocation);
+  const notification = activeFlow === "suite"
+    ? t("We'll text you when your order is on the way to your suite.")
+    : activeFlow === "ship"
+      ? t("Shipping and delivery updates will continue on your phone.")
+      : t("We'll text you when your order is ready for pickup.");
+
+  useEffect(() => {
+    const countdownId = window.setInterval(() => {
+      setSecondsRemaining((current) => Math.max(0, current - 1));
+    }, 1000);
+    const resetId = window.setTimeout(onClose, 10000);
+
+    return () => {
+      window.clearInterval(countdownId);
+      window.clearTimeout(resetId);
+    };
+  }, [onClose]);
+
+  return (
+    <div className="order-confirm-screen">
+      <header className="order-confirm-hero">
+        <div className="order-confirm-icon" aria-hidden="true">
+          <BadgeCheck />
+        </div>
+        <p className="kicker">{t("Order received")}</p>
+        <h2>{t("Order Confirmed")}</h2>
+        <p>{t("Your order has been placed.")}</p>
+      </header>
+
+      <section className="order-confirm-card" aria-label={t("Order confirmation details")}>
+        <div className="order-confirm-reference">
+          <span>{t("Order reference")}</span>
+          <strong>{orderId}</strong>
+        </div>
+        <div className="order-confirm-grid">
+          <div>
+            <span>{t("Service")}</span>
+            <strong>{service}</strong>
+          </div>
+          <div>
+            <span>{t("Fulfillment")}</span>
+            <strong>{fulfillment}</strong>
+          </div>
+          <div>
+            <span>{t("Kiosk selection")}</span>
+            <strong>{itemCountLabel}</strong>
+          </div>
+          <div>
+            <span>{t("Estimated total")}</span>
+            <strong>{formatPrice(total)}</strong>
+          </div>
+        </div>
+        <div className="order-confirm-notice">
+          {activeFlow === "ship" ? <Truck /> : <Bell />}
+          <div>
+            <strong>{t("We'll keep you updated")}</strong>
+            <span>{notification}</span>
+          </div>
+        </div>
+      </section>
+
+      <div className="confirmation-exit">
+        <span>{t("This kiosk will reset in {count} seconds.", { count: secondsRemaining })}</span>
+        <button className="primary-action" onClick={onClose}>
+          <Check />
+          {t("Close")}
+        </button>
+      </div>
     </div>
   );
 }
