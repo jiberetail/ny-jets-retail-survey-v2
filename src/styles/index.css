@@ -1491,6 +1491,178 @@ button {
   font-weight: 850;
 }
 
+.stadium-contact-screen {
+  gap: 22px;
+}
+
+.notification-promise {
+  min-height: 148px;
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr);
+  align-items: center;
+  gap: 22px;
+  padding: 24px 30px;
+  border: 2px solid rgba(170, 238, 204, 0.54);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(5, 31, 22, 0.96), rgba(18, 87, 64, 0.94));
+  color: #ffffff;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.24);
+}
+
+.notification-promise > span {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(183, 241, 210, 0.5);
+  border-radius: 8px;
+  color: #b7f1d2;
+  background: rgba(183, 241, 210, 0.11);
+}
+
+.notification-promise svg {
+  width: 38px;
+  height: 38px;
+}
+
+.notification-promise strong {
+  display: block;
+  font-size: 30px;
+  line-height: 1.1;
+  font-weight: 950;
+}
+
+.notification-promise p {
+  margin: 8px 0 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 20px;
+  line-height: 1.3;
+  font-weight: 700;
+}
+
+.stadium-contact-form {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.stadium-contact-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.stadium-contact-fields label {
+  display: grid;
+  gap: 11px;
+  color: #ffffff;
+  font-size: 21px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.stadium-contact-fields label > span {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.stadium-contact-fields label svg {
+  width: 24px;
+  height: 24px;
+  color: #aee8ca;
+}
+
+.stadium-contact-fields input {
+  width: 100%;
+  min-width: 0;
+  min-height: 94px;
+  padding: 0 22px;
+  border: 3px solid rgba(255, 255, 255, 0.82);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #06130e;
+  font-size: 28px;
+  font-weight: 850;
+  outline: 0;
+}
+
+.stadium-contact-fields input:focus {
+  border-color: #2ed175;
+  box-shadow: 0 0 0 5px rgba(46, 209, 117, 0.24);
+}
+
+.stadium-contact-fields input::placeholder {
+  color: rgba(6, 19, 14, 0.42);
+}
+
+.contact-order-summary {
+  min-height: 162px;
+  display: grid;
+  grid-template-columns: 0.9fr 1.55fr 0.8fr;
+  align-items: center;
+  padding: 26px 22px;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #06130e;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.22);
+}
+
+.contact-order-summary > div {
+  min-width: 0;
+  padding: 0 20px;
+}
+
+.contact-order-summary > div + div {
+  border-left: 1px solid rgba(6, 19, 14, 0.14);
+}
+
+.contact-order-summary span,
+.contact-order-summary strong {
+  display: block;
+}
+
+.contact-order-summary span {
+  margin-bottom: 10px;
+  color: rgba(6, 19, 14, 0.58);
+  font-size: 17px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.contact-order-summary strong {
+  overflow-wrap: anywhere;
+  font-size: 26px;
+  line-height: 1.14;
+  font-weight: 950;
+}
+
+.sms-disclosure {
+  max-width: 860px;
+  margin: 0 auto;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 18px;
+  line-height: 1.35;
+  font-weight: 700;
+  text-align: center;
+}
+
+.contact-submit-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  margin-top: auto;
+}
+
+.contact-submit-action svg {
+  width: 31px;
+  height: 31px;
+}
+
 .consent-card {
   grid-template-columns: 54px 1fr;
   color: #06130e;

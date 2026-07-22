@@ -160,6 +160,25 @@ const spanish: Record<string, string> = {
   "MetLife Gate Shop Pickup": "Recogida en la Tienda de la Puerta MetLife",
   "Mezzanine Merchandise Window": "Ventanilla de Mercancía del Mezzanine",
 
+  "Order notifications": "Notificaciones del pedido",
+  "Stay Updated on Your Order": "Recibe Actualizaciones de tu Pedido",
+  "We'll text you when your delivery is on the way to your suite.":
+    "Te enviaremos un mensaje cuando la entrega vaya camino a tu suite.",
+  "We'll text you when your order is ready for pickup.":
+    "Te enviaremos un mensaje cuando tu pedido esté listo para recoger.",
+  "Real-time order updates": "Actualizaciones del pedido en tiempo real",
+  "Enter the mobile number that should receive this order's status notification.":
+    "Ingresa el número móvil que debe recibir la notificación del estado de este pedido.",
+  "Enter your full name": "Ingresa tu nombre completo",
+  "Enter a mobile number": "Ingresa un número móvil",
+  Service: "Servicio",
+  "Delivery location": "Lugar de entrega",
+  "Pickup location": "Lugar de recogida",
+  "By continuing, you agree to receive order-status text messages. Message and data rates may apply.":
+    "Al continuar, aceptas recibir mensajes de texto sobre el estado del pedido. Pueden aplicarse tarifas de mensajes y datos.",
+  "Sending order...": "Enviando pedido...",
+  "Continue to Phone Checkout": "Continuar al Pago en el Teléfono",
+
   "Mobile number": "Número de móvil",
   "Secure online checkout": "Pago seguro en línea",
   "Scan to Complete Your Purchase": "Escanea para Completar tu Compra",

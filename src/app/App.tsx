@@ -13,8 +13,10 @@ import {
   Languages,
   MapPin,
   PackageCheck,
+  Phone,
   QrCode,
   Search,
+  Send,
   ShieldCheck,
   ShoppingBag,
   ShoppingCart,
@@ -22,6 +24,7 @@ import {
   Ticket,
   ThumbsUp,
   Truck,
+  UserRound,
   Users,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
@@ -30,6 +33,11 @@ import heroVideo from "../imports/grok-video-9e94842e-7a91-4f32-8ace-1e4f9bb82a2
 import fieldVideo from "../imports/grok-video-67c07eb1-53de-4b2d-bf02-0ebcdcc7e644.mp4";
 import shopCatalogData from "../data/jets-shop-catalog.json";
 import { useV2Language, type V2Translate } from "./contexts/V2LanguageContext";
+import {
+  flushQueuedStadiumOrders,
+  submitStadiumOrder,
+  type StadiumOrder,
+} from "./stadiumOrders";
 
 const STAGE_WIDTH = 1080;
 const STAGE_HEIGHT = 1920;
@@ -47,6 +55,7 @@ type Screen =
   | "detail"
   | "basket"
   | "fulfillment"
+  | "contact"
   | "checkout"
   | "inventory-error"
   | "ticket-start"
@@ -201,6 +210,11 @@ function buildOrderId(flow: Flow | null) {
   return `${prefix}-${Math.floor(1200 + Math.random() * 7800)}`;
 }
 
+function buildStadiumOrderId() {
+  const uniqueValue = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  return `stadium-${uniqueValue}`;
+}
+
 export default function App() {
   const [stageScale, setStageScale] = useState(1);
   const [screen, setScreen] = useState<Screen>("home");
@@ -212,6 +226,10 @@ export default function App() {
   const [quantity, setQuantity] = useState(1);
   const [cart, setCart] = useState<CartLine[]>([]);
   const [selectedLocation, setSelectedLocation] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [stadiumOrderId, setStadiumOrderId] = useState(buildStadiumOrderId);
+  const [isSubmittingStadiumOrder, setIsSubmittingStadiumOrder] = useState(false);
   const [ticketContactMethod, setTicketContactMethod] = useState("");
   const [lostProduct, setLostProduct] = useState<Product | null>(null);
   const [lostSize, setLostSize] = useState("");
@@ -228,6 +246,20 @@ export default function App() {
     fitStageToViewport();
     window.addEventListener("resize", fitStageToViewport);
     return () => window.removeEventListener("resize", fitStageToViewport);
+  }, []);
+
+  useEffect(() => {
+    const flushOrders = () => {
+      void flushQueuedStadiumOrders();
+    };
+    const intervalId = window.setInterval(flushOrders, 15000);
+
+    flushOrders();
+    window.addEventListener("online", flushOrders);
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener("online", flushOrders);
+    };
   }, []);
 
   const merchFlow = activeFlow === "concierge" || activeFlow === "suite" || activeFlow === "ship" ? activeFlow : null;
@@ -253,6 +285,9 @@ export default function App() {
     setSelectedSize("");
     setQuantity(1);
     setSelectedLocation("");
+    setCustomerName("");
+    setCustomerPhone("");
+    setIsSubmittingStadiumOrder(false);
     setTicketContactMethod("");
     setLostProduct(null);
     setLostSize("");
@@ -276,6 +311,10 @@ export default function App() {
     setQuantity(1);
     setSelectedSize("");
     setSelectedLocation("");
+    setCustomerName("");
+    setCustomerPhone("");
+    setStadiumOrderId(buildStadiumOrderId());
+    setIsSubmittingStadiumOrder(false);
     setTicketContactMethod("");
     setLostProduct(null);
     setLostSize("");
@@ -306,7 +345,8 @@ export default function App() {
     else if (screen === "detail") setScreen("products");
     else if (screen === "basket") setScreen("products");
     else if (screen === "fulfillment") setScreen("basket");
-    else if (screen === "checkout") setScreen(activeFlow === "ship" ? "basket" : "fulfillment");
+    else if (screen === "contact") setScreen("fulfillment");
+    else if (screen === "checkout") setScreen(activeFlow === "ship" ? "basket" : "contact");
     else if (screen === "inventory-error") setScreen("detail");
     else if (screen === "ticket-lead" || screen === "ticket-qr") setScreen("ticket-start");
     else if (screen === "ticket-confirm") setScreen("ticket-lead");
@@ -340,6 +380,52 @@ export default function App() {
     setSelectedSize("");
     setQuantity(1);
     setScreen("detail");
+  };
+
+  const submitCurrentStadiumOrder = async () => {
+    if ((activeFlow !== "concierge" && activeFlow !== "suite") || isSubmittingStadiumOrder) return;
+
+    const now = new Date().toISOString();
+    const order: StadiumOrder = {
+      version: 1,
+      id: stadiumOrderId,
+      reference: confirmationId,
+      createdAt: now,
+      updatedAt: now,
+      kioskId: "MetLife Kiosk 01",
+      service: activeFlow,
+      status: "new",
+      customer: {
+        name: customerName.trim(),
+        phone: customerPhone.trim(),
+      },
+      fulfillment: {
+        location: selectedLocation,
+        instructions: activeFlow === "suite"
+          ? "Text when the order is on the way to the suite"
+          : "Text when the order is ready for pickup",
+      },
+      items: cart.map((line) => ({
+        id: line.product.id,
+        name: line.product.name,
+        image: line.product.image,
+        size: line.size,
+        quantity: line.quantity,
+        unitPrice: line.product.price,
+      })),
+      itemCount: cart.reduce((count, line) => count + line.quantity, 0),
+      subtotal,
+      tax,
+      total,
+    };
+
+    setIsSubmittingStadiumOrder(true);
+    try {
+      await submitStadiumOrder(order);
+      setScreen("checkout");
+    } finally {
+      setIsSubmittingStadiumOrder(false);
+    }
   };
 
   const renderContent = () => {
@@ -415,7 +501,21 @@ export default function App() {
             activeFlow={merchFlow}
             selectedLocation={selectedLocation}
             onSelectLocation={setSelectedLocation}
-            onNext={() => setScreen("checkout")}
+            onNext={() => setScreen("contact")}
+          />
+        );
+      case "contact":
+        return (
+          <StadiumContactScreen
+            activeFlow={merchFlow}
+            name={customerName}
+            phone={customerPhone}
+            selectedLocation={selectedLocation}
+            total={total}
+            isSubmitting={isSubmittingStadiumOrder}
+            onName={setCustomerName}
+            onPhone={setCustomerPhone}
+            onSubmit={submitCurrentStadiumOrder}
           />
         );
       case "checkout":
@@ -1093,6 +1193,110 @@ function FulfillmentScreen({
       <button className="primary-action bottom-action" disabled={!selectedLocation} onClick={onNext}>
         {t("Continue")}
       </button>
+    </div>
+  );
+}
+
+function StadiumContactScreen({
+  activeFlow,
+  name,
+  phone,
+  selectedLocation,
+  total,
+  isSubmitting,
+  onName,
+  onPhone,
+  onSubmit,
+}: {
+  activeFlow: MerchFlow | null;
+  name: string;
+  phone: string;
+  selectedLocation: string;
+  total: number;
+  isSubmitting: boolean;
+  onName: (name: string) => void;
+  onPhone: (phone: string) => void;
+  onSubmit: () => void;
+}) {
+  const { t } = useV2Language();
+  const isSuiteDelivery = activeFlow === "suite";
+  const phoneDigits = phone.replace(/\D/g, "");
+  const canSubmit = name.trim().length >= 2 && phoneDigits.length >= 10 && !isSubmitting;
+
+  return (
+    <div className="content-stack stadium-contact-screen">
+      <ScreenHeader
+        kicker={t("Order notifications")}
+        title={t("Stay Updated on Your Order")}
+        copy={isSuiteDelivery
+          ? t("We'll text you when your delivery is on the way to your suite.")
+          : t("We'll text you when your order is ready for pickup.")}
+      />
+
+      <section className="notification-promise">
+        <span><Bell /></span>
+        <div>
+          <strong>{t("Real-time order updates")}</strong>
+          <p>{t("Enter the mobile number that should receive this order's status notification.")}</p>
+        </div>
+      </section>
+
+      <form
+        className="stadium-contact-form"
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (canSubmit) onSubmit();
+        }}
+      >
+        <div className="stadium-contact-fields">
+          <label>
+            <span><UserRound /> {t("Full name")}</span>
+            <input
+              autoComplete="name"
+              maxLength={80}
+              value={name}
+              onChange={(event) => onName(event.target.value)}
+              placeholder={t("Enter your full name")}
+            />
+          </label>
+          <label>
+            <span><Phone /> {t("Mobile number")}</span>
+            <input
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
+              maxLength={24}
+              value={phone}
+              onChange={(event) => onPhone(event.target.value)}
+              placeholder={t("Enter a mobile number")}
+            />
+          </label>
+        </div>
+
+        <div className="contact-order-summary">
+          <div>
+            <span>{t("Service")}</span>
+            <strong>{isSuiteDelivery ? t("Suite Delivery") : t("Concierge Pickup")}</strong>
+          </div>
+          <div>
+            <span>{isSuiteDelivery ? t("Delivery location") : t("Pickup location")}</span>
+            <strong>{t(selectedLocation)}</strong>
+          </div>
+          <div>
+            <span>{t("Estimated total")}</span>
+            <strong>{formatPrice(total)}</strong>
+          </div>
+        </div>
+
+        <p className="sms-disclosure">
+          {t("By continuing, you agree to receive order-status text messages. Message and data rates may apply.")}
+        </p>
+
+        <button className="primary-action contact-submit-action" type="submit" disabled={!canSubmit}>
+          <Send />
+          {isSubmitting ? t("Sending order...") : t("Continue to Phone Checkout")}
+        </button>
+      </form>
     </div>
   );
 }
