@@ -252,7 +252,7 @@ export default function App() {
     const flushOrders = () => {
       void flushQueuedStadiumOrders();
     };
-    const intervalId = window.setInterval(flushOrders, 15000);
+    const intervalId = window.setInterval(flushOrders, 4000);
 
     flushOrders();
     window.addEventListener("online", flushOrders);

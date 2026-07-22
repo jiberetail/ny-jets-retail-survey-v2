@@ -1,10 +1,14 @@
 import { Peer, type DataConnection } from "peerjs";
 
 export const STADIUM_ORDERS_CHANNEL = "jets-stadium-orders-v2";
-export const STADIUM_ORDERS_DASHBOARD_PEER_ID = "jibe-jets-stadium-orders-v2";
+export const STADIUM_ORDERS_DASHBOARD_PEER_IDS = [
+  "jibe-jets-stadium-orders-v2",
+  "jibe-jets-stadium-orders-v2-backup-1",
+  "jibe-jets-stadium-orders-v2-backup-2",
+] as const;
 
 const OUTBOX_KEY = "jibe-jets-stadium-orders-outbox-v2";
-const DELIVERY_TIMEOUT_MS = 5500;
+const DELIVERY_TIMEOUT_MS = 3500;
 
 export type StadiumOrderService = "concierge" | "suite";
 export type StadiumOrderStatus = "new" | "preparing" | "ready" | "out-for-delivery" | "fulfilled";
@@ -96,9 +100,9 @@ function isAcceptedMessage(value: unknown, orderId: string): value is StadiumOrd
     && message.orderId === orderId;
 }
 
-function sendOrder(order: StadiumOrder) {
+function sendOrderToTarget(order: StadiumOrder, targetId: string) {
   return new Promise<boolean>((resolve) => {
-    const peer = new Peer({ debug: 1 });
+    const peer = new Peer({ debug: 1, pingInterval: 5000 });
     let connection: DataConnection | null = null;
     let settled = false;
 
@@ -114,7 +118,7 @@ function sendOrder(order: StadiumOrder) {
     const timeoutId = window.setTimeout(() => finish(false), DELIVERY_TIMEOUT_MS);
 
     peer.on("open", () => {
-      connection = peer.connect(STADIUM_ORDERS_DASHBOARD_PEER_ID, {
+      connection = peer.connect(targetId, {
         reliable: true,
         serialization: "json",
         metadata: { channel: STADIUM_ORDERS_CHANNEL },
@@ -134,9 +138,31 @@ function sendOrder(order: StadiumOrder) {
       });
 
       connection.on("error", () => finish(false));
+      connection.on("close", () => finish(false));
     });
 
     peer.on("error", () => finish(false));
+  });
+}
+
+function sendOrder(order: StadiumOrder) {
+  return new Promise<boolean>((resolve) => {
+    let remainingAttempts = STADIUM_ORDERS_DASHBOARD_PEER_IDS.length;
+    let delivered = false;
+
+    STADIUM_ORDERS_DASHBOARD_PEER_IDS.forEach((targetId) => {
+      void sendOrderToTarget(order, targetId).then((targetDelivered) => {
+        if (delivered) return;
+        if (targetDelivered) {
+          delivered = true;
+          resolve(true);
+          return;
+        }
+
+        remainingAttempts -= 1;
+        if (remainingAttempts === 0) resolve(false);
+      });
+    });
   });
 }
 
